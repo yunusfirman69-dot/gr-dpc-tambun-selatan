@@ -1,0 +1,5 @@
+# Salin file ini menjadi .dev.vars untuk pengujian lokal dengan Wrangler,
+# lalu isi dengan nilai rahasia Anda (jangan pernah unggah .dev.vars ke GitHub).
+ADMIN_EMAIL=admin@tambunselatan.local
+ADMIN_PASSWORD=GantiDenganPasswordKuat2026!
+ADMIN_SESSION_SECRET=ganti-dengan-random-secret-minimal-32-karakter

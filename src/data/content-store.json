@@ -1,0 +1,283 @@
+{
+  "news": [
+    {
+      "slug": "rapat-konsolidasi-awal-dpc-tambun-selatan",
+      "title": "[Contoh Berita] Rapat Konsolidasi Awal Pengurus DPC Tambun Selatan",
+      "category": "Organisasi",
+      "publishedAt": "15 November 2026",
+      "author": "Tim Komunikasi DPC",
+      "excerpt": "Artikel contoh untuk menampilkan format berita organisasi. Pengurus membahas penyusunan agenda kerja dan penguatan struktur ranting.",
+      "content": [
+        "Ini adalah artikel contoh (placeholder) untuk menguji tampilan halaman detail berita pada website Partai Gerakan Rakyat DPC Tambun Selatan.",
+        "Dalam rapat konsolidasi awal, jajaran pengurus membahas pentingnya tata kelola organisasi yang rapi, terbuka, dan berorientasi pada pelayanan masyarakat di Kecamatan Tambun Selatan.",
+        "Konten berita resmi beserta foto dokumentasi kegiatan akan diperbarui melalui Dashboard Admin setelah data resmi disetujui pengurus."
+      ]
+    },
+    {
+      "slug": "bakti-sosial-gotong-royong-warga-bekasi",
+      "title": "[Contoh Berita] Aksi Gotong Royong & Silaturahmi Bersama Warga",
+      "category": "Kegiatan Sosial",
+      "publishedAt": "10 November 2026",
+      "author": "Tim Komunikasi DPC",
+      "excerpt": "Artikel contoh mengenai kegiatan sosial kemasyarakatan bersama tokoh warga dan relawan di wilayah Tambun Selatan.",
+      "content": [
+        "Ini adalah artikel contoh (placeholder) untuk kategori Kegiatan Sosial.",
+        "Semangat gotong royong menjadi fondasi utama setiap kegiatan di tingkat akar rumput. Melalui kolaborasi bersama warga, berbagai persoalan lingkungan dapat ditangani secara bersama-sama.",
+        "Nantikan informasi kegiatan resmi berikutnya melalui halaman Berita dan Galeri website ini."
+      ]
+    },
+    {
+      "slug": "pengumuman-persiapan-portal-informasi-resmi",
+      "title": "[Contoh Pengumuman] Persiapan Peluncuran Portal Informasi Resmi DPC",
+      "category": "Pengumuman",
+      "publishedAt": "05 November 2026",
+      "author": "Sekretariat DPC",
+      "excerpt": "Portal digital DPC Tambun Selatan disiapkan sebagai sarana informasi publik mengenai profil, program kerja, dan kegiatan resmi.",
+      "content": [
+        "Ini adalah pengumuman contoh (placeholder) terkait pembangunan portal website resmi DPC Tambun Selatan.",
+        "Website ini dirancang agar masyarakat dapat dengan mudah mengakses informasi mengenai profil organisasi, struktur pengurus yang disetujui untuk publik, program kerja, serta kontak sekretariat.",
+        "Seluruh data pribadi anggota disimpan secara terpisah dan privat hanya untuk keperluan administrasi internal yang berwenang."
+      ]
+    }
+  ],
+  "gallery": [
+    {
+      "id": "gal-1",
+      "title": "[Contoh Foto] Rapat Koordinasi Pengurus DPC",
+      "category": "Rapat & Konsolidasi",
+      "date": "November 2026",
+      "description": "Placeholder dokumentasi kegiatan rapat koordinasi pengurus DPC Tambun Selatan."
+    },
+    {
+      "id": "gal-2",
+      "title": "[Contoh Foto] Aksi Gotong Royong Lingkungan",
+      "category": "Sosial",
+      "date": "November 2026",
+      "description": "Placeholder dokumentasi kerja bakti bersama warga di Kecamatan Tambun Selatan."
+    },
+    {
+      "id": "gal-3",
+      "title": "[Contoh Foto] Dialog Bersama Pelaku UMKM Lokal",
+      "category": "Ekonomi Rakyat",
+      "date": "Oktober 2026",
+      "description": "Placeholder dokumentasi kunjungan dan dialog pemberdayaan UMKM setempat."
+    },
+    {
+      "id": "gal-4",
+      "title": "[Contoh Foto] Silaturahmi Tokoh Masyarakat",
+      "category": "Silaturahmi",
+      "date": "Oktober 2026",
+      "description": "Placeholder dokumentasi silaturahmi bersama tokoh masyarakat Kabupaten Bekasi."
+    },
+    {
+      "id": "gal-5",
+      "title": "[Contoh Foto] Pembinaan Kader & Ranting",
+      "category": "Organisasi",
+      "date": "Oktober 2026",
+      "description": "Placeholder dokumentasi kegiatan pembinaan struktur ranting desa dan kelurahan."
+    },
+    {
+      "id": "gal-6",
+      "title": "[Contoh Foto] Posko Layanan Aspirasi Warga",
+      "category": "Sosial",
+      "date": "September 2026",
+      "description": "Placeholder dokumentasi posko penerimaan aspirasi masyarakat Tambun Selatan."
+    }
+  ],
+  "programKerja": {
+    "intro": "Rancangan Program Kerja DPC Partai Gerakan Rakyat Kecamatan Tambun Selatan disusun dengan menyelaraskan instruksi utama DPP PGR yaitu Pancakarya, nilai dasar Panca Dharma, serta karakteristik wilayah Tambun Selatan sebagai kawasan padat penduduk, pusat permukiman komuter, dan wilayah penyangga industri/perdagangan di Kabupaten Bekasi.",
+    "landasan": "Pancakarya & Panca Dharma Partai Gerakan Rakyat",
+    "fields": [
+      {
+        "number": "01",
+        "title": "Bidang Organisasi, Keanggotaan, dan Legalitas",
+        "pillar": "Pilar Pancakarya 1 & 2",
+        "focus": "Fokus utama pada penguatan mesin partai hingga ke akar rumput dan tertib administrasi verifikasi.",
+        "items": [
+          {
+            "name": "Pembentukan 100% DPRt (Dewan Pimpinan Ranting)",
+            "description": "Melengkapi struktur kepengurusan di seluruh 9 Desa dan 1 Kelurahan se-Kecamatan Tambun Selatan (Jatimulya, Lambangjaya, Lambangsari, Mangunjaya, Mekarsari, Setiadarma, Setiamekar, Sumberjaya, Tambun, dan Tridayasakti)."
+          },
+          {
+            "name": "Tertib Administrasi & Legalitas",
+            "description": "Melakukan pendataan, pemberkasan KTA/KTP kader secara digital maupun fisik, serta pelaporan resmi keberadaan DPC dan DPRt ke kantor Kecamatan Tambun Selatan, Polsek, Koramil, dan Kesbangpol Kabupaten Bekasi sesuai arahan DPP."
+          },
+          {
+            "name": "Kantor Sekretariat Aktif",
+            "description": "Mengoperasikan sekretariat DPC Tambun Selatan sebagai pusat komando, ruang musyawarah-mufakat pengurus, dan posko pengaduan masyarakat."
+          }
+        ]
+      },
+      {
+        "number": "02",
+        "title": "Bidang Kaderisasi dan Pendidikan Politik",
+        "pillar": "Pilar Panca Dharma",
+        "focus": "Menyiapkan kader yang militan, berintegritas, dan melek politik.",
+        "items": [
+          {
+            "name": "Tindak Lanjut Kelas Kader",
+            "description": "Menyelenggarakan pendidikan politik dan Training of Trainer (ToT) berjenjang bagi pengurus DPC dan DPRt se-Tambun Selatan (melanjutkan semangat Kelas Kader PGR di Bekasi)."
+          },
+          {
+            "name": "Diskusi Publik & Bedah Kebijakan Lokal",
+            "description": "Mengadakan forum rutin bulanan (\"Ngopi Perubahan\") untuk membahas isu-isu lokal Kabupaten Bekasi seperti kemacetan, pengelolaan sampah, banjir perumahan, dan layanan publik."
+          }
+        ]
+      },
+      {
+        "number": "03",
+        "title": "Bidang Sosialisasi, Humas, dan Media Digital",
+        "pillar": "Pilar Pancakarya 3 & 4",
+        "focus": "Meningkatkan brand awareness partai di kalangan warga komuter dan pemilih muda (Gen Z & Milenial) di Tambun Selatan.",
+        "items": [
+          {
+            "name": "Masifikasi Media Sosial DPC",
+            "description": "Mengaktifkan kanal resmi DPC Tambun Selatan di Instagram, TikTok, Facebook, dan YouTube untuk mendokumentasikan setiap gerakan kader serta menyebarkan gagasan perubahan."
+          },
+          {
+            "name": "Branding & Atribut Wilayah",
+            "description": "Melakukan pemasangan atribut, bendera, dan spanduk Partai Gerakan Rakyat di titik-titik strategis serta mewajibkan kader mengenakan atribut partai dalam setiap kegiatan kemasyarakatan."
+          }
+        ]
+      },
+      {
+        "number": "04",
+        "title": "Bidang Aksi Sosial, Kerelawanan, dan Pemberdayaan Masyarakat",
+        "pillar": "Pilar Pancakarya 5",
+        "focus": "Hadir langsung memberikan solusi nyata bagi warga Tambun Selatan.",
+        "items": [
+          {
+            "name": "Bakti Sosial & Kesehatan Gratis",
+            "description": "Menggelar kegiatan rutin seperti donor darah, pemeriksaan kesehatan/cek tensi gratis, dan fogging nyamuk demam berdarah di kompleks perumahan maupun perkampungan."
+          },
+          {
+            "name": "Tim Siaga Bencana & Tanggap Darurat",
+            "description": "Membentuk unit relawan cepat tanggap untuk membantu warga di titik-titik rawan banjir di Tambun Selatan saat musim penghujan."
+          },
+          {
+            "name": "Pemberdayaan UMKM Lokal",
+            "description": "Mengadakan pelatihan pemasaran digital (digital marketing) dan pendampingan perizinan (NIB/Sertifikasi Halal) bagi pelaku usaha mikro di sekitar Tambun Selatan."
+          },
+          {
+            "name": "Kegiatan Keagamaan & Kebangsaan",
+            "description": "Mengadakan santunan anak yatim, buka puasa bersama, dan peringatan hari besar nasional untuk mempererat silaturahmi lintas elemen masyarakat."
+          }
+        ]
+      }
+    ],
+    "implementationMatrix": [
+      {
+        "field": "Organisasi, Keanggotaan & Legalitas",
+        "shortTerm": "Pembentukan 100% DPRt di 9 Desa & 1 Kelurahan, pemberkasan KTA/KTP, dan pelaporan resmi ke Kecamatan, Polsek, Koramil, serta Kesbangpol.",
+        "mediumTerm": "Evaluasi kinerja DPRt berkala, pemutakhiran database kader terpadu, dan optimalisasi sekretariat sebagai posko aspirasi warga.",
+        "indicator": "10/10 DPRt terbentuk lengkap, surat tanda lapor terbit, sekretariat beroperasi rutin."
+      },
+      {
+        "field": "Kaderisasi & Pendidikan Politik",
+        "shortTerm": "Pelaksanaan Kelas Kader / ToT perdana untuk pengurus DPC & DPRt serta peluncuran forum bulanan 'Ngopi Perubahan'.",
+        "mediumTerm": "Kaderisasi berjenjang hingga tingkat ranting dan penyusunan rekomendasi kebijakan lokal (kemacetan, sampah, banjir, layanan publik).",
+        "indicator": "Minimal 1x ToT kader per periode & forum 'Ngopi Perubahan' berjalan rutin setiap bulan."
+      },
+      {
+        "field": "Sosialisasi, Humas & Media Digital",
+        "shortTerm": "Aktivasi penuh Instagram, TikTok, Facebook, YouTube DPC serta pemasangan atribut/bendera di titik-titik strategis Tambun Selatan.",
+        "mediumTerm": "Produksi konten edukasi politik dan dokumentasi aksi kader secara konsisten untuk menjangkau warga komuter, Gen Z, dan Milenial.",
+        "indicator": "4 kanal media sosial aktif terverifikasi & seluruh kegiatan kader terdokumentasi dengan atribut resmi."
+      },
+      {
+        "field": "Aksi Sosial, Relawan & Pemberdayaan",
+        "shortTerm": "Pembentukan Tim Siaga Bencana banjir, kegiatan bakti sosial/cek kesehatan & fogging, serta santunan/peringatan hari besar.",
+        "mediumTerm": "Program pendampingan UMKM berkelanjutan (digital marketing, NIB, Sertifikasi Halal) dan perluasan jangkauan layanan sosial di perumahan & perkampungan.",
+        "indicator": "Unit relawan siaga terbentuk, aksi sosial terlaksana rutin, pelaku UMKM terbantu legalitas & pemasaran."
+      }
+    ]
+  },
+  "officials": [
+    {
+      "id": "off-1",
+      "name": "Bachrum Andria S.E",
+      "position": "Ketua DPC",
+      "division": "Pimpinan Harian",
+      "period": "2026 – 2031",
+      "bio": "Data resmi pengurus akan ditampilkan setelah SK kepengurusan DPC Tambun Selatan diverifikasi.",
+      "photoUrl": "/uploads/officials/officials-1794904390420-ox1ywq.png",
+      "photoShape": "square",
+      "photoFit": "cover",
+      "photoPosition": "top"
+    },
+    {
+      "id": "off-2",
+      "name": "Rida Sukmanawati",
+      "position": "Sekretaris DPC",
+      "division": "Sekjen",
+      "period": "2026 – 2031",
+      "bio": "Mengelola administrasi kesekretariatan dan koordinasi antarbidang di wilayah Tambun Selatan.",
+      "photoPosition": "top",
+      "photoShape": "square",
+      "photoUrl": "/uploads/officials/officials-1794904706113-yg5cpr.jpg"
+    },
+    {
+      "id": "off-3",
+      "name": "Suci Rahayu",
+      "position": "Bendahara DPC",
+      "division": "Bendahara",
+      "period": "2026 – 2031",
+      "bio": "Bertanggung jawab atas pengelolaan keuangan organisasi secara transparan dan akuntabel.",
+      "photoPosition": "top",
+      "photoUrl": "/uploads/officials/officials-1794904756937-ysmwcr.jpg"
+    },
+    {
+      "id": "off-4",
+      "name": "[Nama Ketua Bidang OKK — Placeholder]",
+      "position": "Ketua Bidang Organisasi, Kaderisasi & Keanggotaan",
+      "division": "Bidang OKK",
+      "period": "2026 – 2031",
+      "bio": "Menjalankan penguatan struktur ranting dan pembinaan kader di Kecamatan Tambun Selatan."
+    },
+    {
+      "id": "off-5",
+      "name": "[Nama Ketua Bidang Sosial — Placeholder]",
+      "position": "Ketua Bidang Sosial & Pemberdayaan Masyarakat",
+      "division": "Bidang Sosial",
+      "period": "2026 – 2031",
+      "bio": "Menggerakkan program kepedulian sosial, tanggap bencana, dan dukungan bagi warga."
+    },
+    {
+      "id": "off-6",
+      "name": "[Nama Ketua Bidang Media — Placeholder]",
+      "position": "Ketua Bidang Komunikasi & Media",
+      "division": "Bidang Komunikasi",
+      "period": "2026 – 2031",
+      "bio": "Menyampaikan informasi kegiatan resmi DPC kepada masyarakat melalui kanal digital."
+    }
+  ],
+  "contact": {
+    "address": "[Placeholder Alamat Sekretariat] Jl. Contoh Raya No. 01, Kecamatan Tambun Selatan, Kabupaten Bekasi, Jawa Barat 17510",
+    "phone": "[Placeholder Telepon Resmi] (021) 0000-0000",
+    "whatsapp": "[Placeholder WhatsApp Resmi] +62 812-0000-0000",
+    "email": "sekretariat@contoh-dpc-tambunselatan.org",
+    "hours": "Senin – Jumat, 09.00 – 17.00 WIB",
+    "socials": [
+      {
+        "name": "Instagram",
+        "handle": "@gerakanrakyat.tambunselatan",
+        "href": "#"
+      },
+      {
+        "name": "Facebook",
+        "handle": "Gerakan Rakyat Tambun Selatan",
+        "href": "#"
+      },
+      {
+        "name": "YouTube",
+        "handle": "Gerakan Rakyat Tambun Selatan",
+        "href": "#"
+      },
+      {
+        "name": "TikTok",
+        "handle": "@gerakanrakyat.tamsel",
+        "href": "#"
+      }
+    ]
+  }
+}
