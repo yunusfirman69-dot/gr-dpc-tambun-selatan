@@ -5,6 +5,7 @@ import AdminShell from "@/components/AdminShell";
 import { getAdminSession } from "@/lib/admin-auth";
 import {
   getGalleryItems,
+  getMembersData,
   getNewsPosts,
   getOfficialsData,
   getProgramKerjaData,
@@ -16,11 +17,12 @@ async function AdminDashboardContent() {
     redirect("/admin/login");
   }
 
-  const [news, gallery, programKerja, officials] = await Promise.all([
+  const [news, gallery, programKerja, officials, members] = await Promise.all([
     getNewsPosts(),
     getGalleryItems(),
     getProgramKerjaData(),
     getOfficialsData(),
+    getMembersData(),
   ]);
 
   const totalSubPrograms = programKerja.fields.reduce(
@@ -114,6 +116,21 @@ async function AdminDashboardContent() {
               className="mt-5 inline-block rounded-full border border-[#090909] px-5 py-2.5 text-xs font-bold text-[#090909] transition-colors hover:bg-[#090909] hover:text-white"
             >
               Edit Kontak
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border border-[#e7deda] bg-white p-7 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#ff491a]">
+              Data Anggota (Privat)
+            </p>
+            <p className="mt-2 text-4xl font-black text-[#090909]">
+              {members.length}
+            </p>
+            <Link
+              href="/admin/anggota"
+              className="mt-5 inline-block rounded-full bg-[#ff491a] px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#e03a0e]"
+            >
+              Lihat Data Anggota
             </Link>
           </div>
         </div>

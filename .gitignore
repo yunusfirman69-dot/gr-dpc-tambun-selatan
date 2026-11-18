@@ -41,6 +41,11 @@ yarn-error.log*
 /.wrangler/
 .dev.vars
 
+# private local member data & uploads
+/src/data/private-ktp/
+/src/data/content-store.json
+/public/uploads/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

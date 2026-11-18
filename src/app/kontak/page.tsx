@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { Suspense } from "react";
 import ContactForm from "@/components/ContactForm";
+import MemberRegistrationForm from "@/components/MemberRegistrationForm";
 import PageHeader from "@/components/PageHeader";
 import { getContactData } from "@/lib/content-store";
 
@@ -64,8 +65,9 @@ async function KontakContent() {
           </div>
         </div>
 
-        {/* Form Aspirasi */}
-        <div className="lg:col-span-7">
+        {/* Form Daftar Anggota & Form Aspirasi */}
+        <div className="space-y-8 lg:col-span-7">
+          <MemberRegistrationForm />
           <ContactForm />
         </div>
       </div>

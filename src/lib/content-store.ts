@@ -43,6 +43,17 @@ export interface StoredContactInfo {
   socials: StoredSocialLink[];
 }
 
+export interface StoredMemberItem {
+  id: string;
+  fullName: string;
+  nik: string;
+  phone: string;
+  email: string;
+  village: string;
+  ktpFileName: string;
+  createdAt: string;
+}
+
 export interface StoredProgramKerja {
   intro: string;
   landasan: string;
@@ -56,6 +67,7 @@ interface ContentStoreData {
   programKerja: StoredProgramKerja;
   officials: StoredOfficialItem[];
   contact: StoredContactInfo;
+  members: StoredMemberItem[];
 }
 
 const DATA_FILE_PATH = path.join(process.cwd(), "src", "data", "content-store.json");
@@ -67,6 +79,7 @@ function getInitialData(): ContentStoreData {
     programKerja: programKerjaResmi,
     officials: officialsPlaceholder,
     contact: organizationInfo.contact,
+    members: [],
   };
 }
 
@@ -82,6 +95,7 @@ async function readStore(): Promise<ContentStoreData> {
         ? parsed.officials
         : officialsPlaceholder,
       contact: parsed.contact ?? organizationInfo.contact,
+      members: Array.isArray(parsed.members) ? parsed.members : [],
     };
   } catch {
     // Di lingkungan serverless/read-only (seperti Cloudflare Workers),
@@ -207,4 +221,38 @@ export async function saveContactData(
   store.contact = contact;
   await writeStore(store);
   return store.contact;
+}
+
+export async function getMembersData(): Promise<StoredMemberItem[]> {
+  const store = await readStore();
+  return store.members;
+}
+
+export async function addMemberData(
+  member: Omit<StoredMemberItem, "id" | "createdAt">
+): Promise<StoredMemberItem> {
+  const store = await readStore();
+  const created: StoredMemberItem = {
+    ...member,
+    id: `mbr-${Date.now()}`,
+    createdAt: new Intl.DateTimeFormat("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date()),
+  };
+  store.members = [created, ...store.members];
+  await writeStore(store);
+  return created;
+}
+
+export async function deleteMemberData(id: string): Promise<boolean> {
+  const store = await readStore();
+  const before = store.members.length;
+  store.members = store.members.filter((item) => item.id !== id);
+  if (store.members.length === before) return false;
+  await writeStore(store);
+  return true;
 }
