@@ -9,11 +9,43 @@ export default function ProfilPage() {
       <PageHeader
         badge="Tentang Organisasi"
         title="Profil & Visi Misi"
-        description="Mengenal visi utama, haluan gerakan, agenda perjuangan, serta cakupan wilayah kerja Partai Gerakan Rakyat di Kecamatan Tambun Selatan, Kabupaten Bekasi."
+        description="Mengenal perjalanan organisasi, visi utama, haluan gerakan, agenda perjuangan, serta cakupan wilayah kerja Partai Gerakan Rakyat di Kecamatan Tambun Selatan, Kabupaten Bekasi."
       />
 
       <section className="mx-auto max-w-7xl space-y-12 px-4 py-16 sm:px-6 lg:px-8">
-        {/* Visi Utama & Haluan Gerakan */}
+        {/* 1. Perjalanan Organisasi (Sejarah & Latar Belakang) */}
+        <div className="rounded-3xl border border-[#e7deda] bg-white p-8 sm:p-12">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#ff491a]">
+            Perjalanan Organisasi
+          </p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-[#090909] sm:text-3xl">
+            Sejarah & Latar Belakang
+          </h2>
+          <p className="mt-4 max-w-4xl text-base leading-relaxed text-[#8d6a5e]">
+            {organizationInfo.historySummary}
+          </p>
+
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {organizationInfo.historyTimeline.map((item) => (
+              <div
+                key={item.period}
+                className="rounded-2xl border border-[#e7deda] bg-[#f7f2ee]/60 p-6"
+              >
+                <span className="inline-block rounded-full bg-[#ff491a]/10 px-3 py-1 text-xs font-extrabold text-[#ff491a]">
+                  {item.period}
+                </span>
+                <h3 className="mt-3 text-lg font-extrabold text-[#090909]">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#8d6a5e]">
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 2. Visi Utama & Haluan Gerakan */}
         <div className="rounded-3xl border border-[#e7deda] bg-[#f7f2ee] p-8 sm:p-12">
           <div className="text-center">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#090909]">
@@ -94,7 +126,7 @@ export default function ProfilPage() {
           </div>
         </div>
 
-        {/* Misi Perjuangan */}
+        {/* 3. Misi Perjuangan */}
         <div className="rounded-3xl border border-[#e7deda] bg-[#f7f2ee] p-8 sm:p-12">
           <div className="text-center">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#090909]">
@@ -127,39 +159,7 @@ export default function ProfilPage() {
           </div>
         </div>
 
-        {/* Sejarah & Latar Belakang */}
-        <div className="rounded-3xl border border-[#e7deda] bg-white p-8 sm:p-12">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#ff491a]">
-            Perjalanan Organisasi
-          </p>
-          <h2 className="mt-2 text-2xl font-black tracking-tight text-[#090909] sm:text-3xl">
-            Sejarah & Latar Belakang
-          </h2>
-          <p className="mt-4 max-w-4xl text-base leading-relaxed text-[#8d6a5e]">
-            {organizationInfo.historySummary}
-          </p>
-
-          <div className="mt-8 grid gap-5 md:grid-cols-2">
-            {organizationInfo.historyTimeline.map((item) => (
-              <div
-                key={item.period}
-                className="rounded-2xl border border-[#e7deda] bg-[#f7f2ee]/60 p-6"
-              >
-                <span className="inline-block rounded-full bg-[#ff491a]/10 px-3 py-1 text-xs font-extrabold text-[#ff491a]">
-                  {item.period}
-                </span>
-                <h3 className="mt-3 text-lg font-extrabold text-[#090909]">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#8d6a5e]">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Wilayah Organisasi */}
+        {/* 4. Wilayah Organisasi */}
         <div className="rounded-3xl border border-[#e7deda] bg-white p-8 sm:p-10">
           <h2 className="text-2xl font-extrabold text-[#090909]">
             Wilayah Kerja Organisasi
