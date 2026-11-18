@@ -84,9 +84,9 @@ async function readStore(): Promise<ContentStoreData> {
       contact: parsed.contact ?? organizationInfo.contact,
     };
   } catch {
-    const initial = getInitialData();
-    await writeStore(initial);
-    return initial;
+    // Di lingkungan serverless/read-only (seperti Cloudflare Workers),
+    // kembalikan data bawaan tanpa mencoba menulis ke disk.
+    return getInitialData();
   }
 }
 
