@@ -1,22 +1,91 @@
-import { ConvexHttpClient } from "convex/browser";
-import { anyApi } from "convex/server";
+export interface ConvexFetchClient {
+  query: (path: string, args?: Record<string, unknown>) => Promise<unknown>;
+  mutation: (path: string, args?: Record<string, unknown>) => Promise<unknown>;
+}
 
 export function getConvexUrl(): string | null {
-  const url = process.env.NEXT_PUBLIC_CONVEX_URL?.trim();
+  const url = process.env.NEXT_PUBLIC_CONVEX_URL?.trim().replace(/\/+$/, "");
   return url || null;
 }
 
-export function getConvexClient(): ConvexHttpClient | null {
-  const url = getConvexUrl();
-  if (!url) return null;
-  try {
-    return new ConvexHttpClient(url);
-  } catch {
-    return null;
+async function callConvexEndpoint(
+  baseUrl: string,
+  kind: "query" | "mutation",
+  fnPath: string,
+  args: Record<string, unknown> = {}
+): Promise<unknown> {
+  const res = await fetch(`${baseUrl}/api/${kind}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      path: fnPath,
+      args,
+      format: "json",
+    }),
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Convex ${kind} (${fnPath}) failed: ${res.status} ${text}`);
   }
+
+  const data = (await res.json()) as {
+    status?: string;
+    value?: unknown;
+    errorMessage?: string;
+  };
+
+  if (data.status === "error") {
+    throw new Error(data.errorMessage || `Convex ${kind} error on ${fnPath}`);
+  }
+
+  return data.value;
 }
 
-export const convexApi = anyApi;
+export function getConvexClient(): ConvexFetchClient | null {
+  const url = getConvexUrl();
+  if (!url) return null;
+
+  return {
+    query: (fnPath, args = {}) =>
+      callConvexEndpoint(url, "query", fnPath, args),
+    mutation: (fnPath, args = {}) =>
+      callConvexEndpoint(url, "mutation", fnPath, args),
+  };
+}
+
+export const convexApi = {
+  content: {
+    generateUploadUrl: "content:generateUploadUrl",
+    getStorageUrl: "content:getStorageUrl",
+    listNews: "content:listNews",
+    getNewsBySlug: "content:getNewsBySlug",
+    addNews: "content:addNews",
+    deleteNews: "content:deleteNews",
+    listGallery: "content:listGallery",
+    addGallery: "content:addGallery",
+    deleteGallery: "content:deleteGallery",
+    getProgramKerja: "content:getProgramKerja",
+    saveProgramKerja: "content:saveProgramKerja",
+    listOfficials: "content:listOfficials",
+    saveOfficials: "content:saveOfficials",
+    getContact: "content:getContact",
+    saveContact: "content:saveContact",
+  },
+  members: {
+    listMembers: "members:listMembers",
+    addMember: "members:addMember",
+    deleteMember: "members:deleteMember",
+  },
+  admins: {
+    countAdmins: "admins:countAdmins",
+    getAdminByEmail: "admins:getAdminByEmail",
+    listAdmins: "admins:listAdmins",
+    createAdmin: "admins:createAdmin",
+    deleteAdmin: "admins:deleteAdmin",
+  },
+} as const;
 
 export async function uploadFileToConvexStorage(
   file: File
