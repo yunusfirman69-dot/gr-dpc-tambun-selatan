@@ -1,6 +1,6 @@
 export interface ConvexFetchClient {
-  query: (path: string, args?: Record<string, unknown>) => Promise<unknown>;
-  mutation: (path: string, args?: Record<string, unknown>) => Promise<unknown>;
+  query: (path: string, args?: object) => Promise<unknown>;
+  mutation: (path: string, args?: object) => Promise<unknown>;
 }
 
 export function getConvexUrl(): string | null {
@@ -12,7 +12,7 @@ async function callConvexEndpoint(
   baseUrl: string,
   kind: "query" | "mutation",
   fnPath: string,
-  args: Record<string, unknown> = {}
+  args: object = {}
 ): Promise<unknown> {
   const res = await fetch(`${baseUrl}/api/${kind}`, {
     method: "POST",
