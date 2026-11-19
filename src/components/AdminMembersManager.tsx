@@ -34,6 +34,75 @@ export default function AdminMembersManager({
     }
   }
 
+  function escapeXml(value: string): string {
+    return value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&apos;");
+  }
+
+  function handleExportExcel() {
+    const rowsXml = filtered
+      .map(
+        (m, idx) => `
+      <Row>
+        <Cell><Data ss:Type="Number">${idx + 1}</Data></Cell>
+        <Cell><Data ss:Type="String">${escapeXml(m.fullName)}</Data></Cell>
+        <Cell><Data ss:Type="String">${escapeXml(m.nik)}</Data></Cell>
+        <Cell><Data ss:Type="String">${escapeXml(m.phone)}</Data></Cell>
+        <Cell><Data ss:Type="String">${escapeXml(m.email)}</Data></Cell>
+        <Cell><Data ss:Type="String">${escapeXml(m.village)}</Data></Cell>
+        <Cell><Data ss:Type="String">${escapeXml(m.createdAt)}</Data></Cell>
+      </Row>`
+      )
+      .join("");
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ <Styles>
+  <Style ss:ID="Header">
+   <Font ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#FF491A" ss:Pattern="Solid"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Data Anggota DPC">
+  <Table>
+   <Column ss:Width="40"/>
+   <Column ss:Width="180"/>
+   <Column ss:Width="140"/>
+   <Column ss:Width="120"/>
+   <Column ss:Width="180"/>
+   <Column ss:Width="140"/>
+   <Column ss:Width="140"/>
+   <Row>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">No</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Nama Lengkap</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">NIK</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">No. HP / WhatsApp</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Email</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Desa / Kelurahan</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Waktu Daftar</Data></Cell>
+   </Row>
+   ${rowsXml}
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+    const blob = new Blob(["\uFEFF" + xml], {
+      type: "application/vnd.ms-excel;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "data-anggota-dpc-tambun-selatan.xls";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   function handleExportCsv() {
     const header = [
       "Nama Lengkap",
@@ -51,12 +120,13 @@ export default function AdminMembersManager({
       `"${m.village}"`,
       `"${m.createdAt}"`,
     ]);
-    const csv = [header.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const csv =
+      "\uFEFF" + [header.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `data-anggota-dpc-tambun-selatan.csv`;
+    a.download = "data-anggota-dpc-tambun-selatan.csv";
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -78,13 +148,22 @@ export default function AdminMembersManager({
         </div>
 
         {filtered.length > 0 && (
-          <button
-            type="button"
-            onClick={handleExportCsv}
-            className="self-start rounded-full bg-[#090909] px-5 py-2.5 text-xs font-bold text-white hover:bg-neutral-800"
-          >
-            Ekspor CSV ({filtered.length})
-          </button>
+          <div className="flex flex-wrap gap-2 self-start">
+            <button
+              type="button"
+              onClick={handleExportExcel}
+              className="rounded-full bg-[#ff491a] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#e03a0e]"
+            >
+              Download Excel (.xls) ({filtered.length})
+            </button>
+            <button
+              type="button"
+              onClick={handleExportCsv}
+              className="rounded-full bg-[#090909] px-5 py-2.5 text-xs font-bold text-white hover:bg-neutral-800"
+            >
+              Ekspor CSV
+            </button>
+          </div>
         )}
       </div>
 

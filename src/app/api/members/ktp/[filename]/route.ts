@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin-auth";
+import { convexApi, getConvexClient } from "@/lib/convex-client";
 
 const MIME_MAP: Record<string, string> = {
   ".jpg": "image/jpeg",
@@ -23,6 +24,47 @@ export async function GET(
   }
 
   const { filename } = await context.params;
+  const convex = getConvexClient();
+
+  if (convex) {
+    try {
+      const storageUrl = (await convex.query(convexApi.content.getStorageUrl, {
+        storageId: filename,
+      })) as string | null;
+
+      if (!storageUrl) {
+        return NextResponse.json(
+          { error: "File KTP tidak ditemukan." },
+          { status: 404 }
+        );
+      }
+
+      const fileRes = await fetch(storageUrl);
+      if (!fileRes.ok) {
+        return NextResponse.json(
+          { error: "Gagal mengambil file KTP." },
+          { status: 502 }
+        );
+      }
+
+      const contentType =
+        fileRes.headers.get("content-type") || "application/octet-stream";
+      const data = await fileRes.arrayBuffer();
+
+      return new NextResponse(data, {
+        headers: {
+          "Content-Type": contentType,
+          "Cache-Control": "private, no-store",
+        },
+      });
+    } catch {
+      return NextResponse.json(
+        { error: "Gagal memuat file KTP." },
+        { status: 500 }
+      );
+    }
+  }
+
   const safeName = path.basename(filename);
   const filePath = path.join(
     process.cwd(),

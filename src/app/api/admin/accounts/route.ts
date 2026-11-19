@@ -1,0 +1,62 @@
+import { NextResponse } from "next/server";
+import { getAdminSession } from "@/lib/admin-auth";
+import { convexApi, getConvexClient } from "@/lib/convex-client";
+
+export async function GET() {
+  const session = await getAdminSession();
+  if (!session) {
+    return NextResponse.json({ error: "Tidak diizinkan." }, { status: 401 });
+  }
+
+  const convex = getConvexClient();
+  if (!convex) {
+    return NextResponse.json({ admins: [] });
+  }
+
+  try {
+    const admins = await convex.query(convexApi.admins.listAdmins, {});
+    return NextResponse.json({ admins });
+  } catch {
+    return NextResponse.json({ admins: [] });
+  }
+}
+
+export async function DELETE(request: Request) {
+  const session = await getAdminSession();
+  if (!session || session.role !== "super_admin") {
+    return NextResponse.json(
+      { error: "Hanya Super Admin yang dapat menghapus akun admin." },
+      { status: 403 }
+    );
+  }
+
+  const convex = getConvexClient();
+  if (!convex) {
+    return NextResponse.json(
+      { error: "Convex belum dikonfigurasi." },
+      { status: 503 }
+    );
+  }
+
+  try {
+    const { id } = (await request.json()) as { id?: string };
+    if (!id) {
+      return NextResponse.json({ error: "ID admin wajib diisi." }, { status: 400 });
+    }
+
+    await convex.mutation(convexApi.admins.deleteAdmin, { id });
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "";
+    if (message.includes("CANNOT_DELETE_LAST_ADMIN")) {
+      return NextResponse.json(
+        { error: "Tidak dapat menghapus satu-satunya akun admin." },
+        { status: 400 }
+      );
+    }
+    return NextResponse.json(
+      { error: "Gagal menghapus akun admin." },
+      { status: 500 }
+    );
+  }
+}

@@ -3,7 +3,10 @@ import {
   ADMIN_COOKIE_NAME,
   getAdminCredentials,
   signSessionToken,
+  verifyPassword,
+  type AdminRole,
 } from "@/lib/admin-auth";
+import { convexApi, getConvexClient } from "@/lib/convex-client";
 
 export async function POST(request: Request) {
   try {
@@ -12,22 +15,64 @@ export async function POST(request: Request) {
       password?: string;
     };
 
-    const email = body.email?.trim() || "";
+    const email = body.email?.trim().toLowerCase() || "";
     const password = body.password || "";
-    const expected = getAdminCredentials();
 
-    if (
-      email.toLowerCase() !== expected.email.toLowerCase() ||
-      password !== expected.password
-    ) {
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: "Email dan kata sandi wajib diisi." },
+        { status: 400 }
+      );
+    }
+
+    let authenticated = false;
+    let role: AdminRole = "super_admin";
+    let name: string | undefined;
+
+    // 1. Cek di database Convex (tabel admins) terlebih dahulu
+    const convex = getConvexClient();
+    if (convex) {
+      try {
+        const adminRow = (await convex.query(convexApi.admins.getAdminByEmail, {
+          email,
+        })) as {
+          fullName: string;
+          email: string;
+          passwordHash: string;
+          role: AdminRole;
+        } | null;
+
+        if (adminRow && (await verifyPassword(password, adminRow.passwordHash))) {
+          authenticated = true;
+          role = adminRow.role;
+          name = adminRow.fullName;
+        }
+      } catch {
+        // Lanjut ke fallback env jika fungsi Convex belum di-deploy
+      }
+    }
+
+    // 2. Fallback ke kredensial environment variable / default lokal
+    if (!authenticated) {
+      const expected = getAdminCredentials();
+      if (
+        email === expected.email.toLowerCase() &&
+        password === expected.password
+      ) {
+        authenticated = true;
+        role = "super_admin";
+      }
+    }
+
+    if (!authenticated) {
       return NextResponse.json(
         { error: "Email atau kata sandi salah." },
         { status: 401 }
       );
     }
 
-    const token = signSessionToken(email);
-    const response = NextResponse.json({ ok: true, email });
+    const token = signSessionToken(email, role, name);
+    const response = NextResponse.json({ ok: true, email, role, name });
 
     response.cookies.set(ADMIN_COOKIE_NAME, token, {
       httpOnly: true,

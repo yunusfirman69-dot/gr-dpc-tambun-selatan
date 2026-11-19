@@ -25,6 +25,7 @@ export async function POST(request: Request) {
       excerpt?: string;
       content?: string;
       imageUrl?: string;
+      imageStorageId?: string;
     };
 
     const title = body.title?.trim() || "";
@@ -33,6 +34,7 @@ export async function POST(request: Request) {
     const excerpt = body.excerpt?.trim() || "";
     const contentRaw = body.content?.trim() || "";
     const imageUrl = body.imageUrl?.trim() || undefined;
+    const imageStorageId = body.imageStorageId?.trim() || undefined;
 
     if (!title || !excerpt || !contentRaw) {
       return NextResponse.json(
@@ -60,6 +62,7 @@ export async function POST(request: Request) {
       content: paragraphs,
       publishedAt: formattedDate,
       imageUrl,
+      imageStorageId,
     });
 
     revalidatePath("/");

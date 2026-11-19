@@ -119,12 +119,18 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 flex items-center justify-between text-xs">
+          <Link
+            href="/admin/register"
+            className="font-semibold text-[#ffc3b3] hover:text-[#ff491a]"
+          >
+            Registrasi Akun Admin
+          </Link>
           <Link
             href="/"
-            className="text-xs font-semibold text-neutral-400 hover:text-[#ff491a]"
+            className="font-semibold text-neutral-400 hover:text-[#ff491a]"
           >
-            ← Kembali ke Website Publik
+            ← Kembali ke Website
           </Link>
         </div>
       </div>

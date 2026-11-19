@@ -42,9 +42,13 @@ export default function AdminGalleryManager({
       fd.append("file", file);
       fd.append("folder", "gallery");
       const upRes = await fetch("/api/upload", { method: "POST", body: fd });
-      const upData = (await upRes.json()) as { url?: string; error?: string };
+      const upData = (await upRes.json()) as {
+        url?: string;
+        storageId?: string;
+        error?: string;
+      };
 
-      if (!upRes.ok || !upData.url) {
+      if (!upRes.ok || (!upData.url && !upData.storageId)) {
         setMessage({
           type: "err",
           text: upData.error || "Gagal mengunggah foto.",
@@ -62,6 +66,7 @@ export default function AdminGalleryManager({
           date,
           description,
           imageUrl: upData.url,
+          imageStorageId: upData.storageId,
         }),
       });
 

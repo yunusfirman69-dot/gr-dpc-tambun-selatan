@@ -2,6 +2,10 @@ import fs from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin-auth";
+import {
+  getConvexClient,
+  uploadFileToConvexStorage,
+} from "@/lib/convex-client";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES: Record<string, string> = {
@@ -53,6 +57,11 @@ export async function POST(request: Request) {
         { error: "Ukuran file maksimal adalah 5 MB." },
         { status: 400 }
       );
+    }
+
+    if (getConvexClient()) {
+      const { storageId, url } = await uploadFileToConvexStorage(file);
+      return NextResponse.json({ url, storageId });
     }
 
     const bytes = await file.arrayBuffer();

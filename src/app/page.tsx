@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import MemberRegistrationForm from "@/components/MemberRegistrationForm";
 import {
   organizationInfo,
   pillars,
@@ -100,9 +101,15 @@ export default function Home() {
             </p>
 
             <div className="flex flex-wrap gap-4 pt-2">
+              <a
+                href="#daftar-anggota"
+                className="rounded-full bg-[#ff491a] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#ff491a]/30 transition-all hover:bg-[#e03a0e]"
+              >
+                Daftar Sebagai Anggota
+              </a>
               <Link
                 href="/program-kerja"
-                className="rounded-full bg-[#ff491a] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#ff491a]/30 transition-all hover:bg-[#e03a0e]"
+                className="rounded-full border border-neutral-700 bg-neutral-900/70 px-7 py-3.5 text-sm font-bold text-white transition-colors hover:border-[#ff491a] hover:text-[#ffc3b3]"
               >
                 Lihat Program Kerja
               </Link>
@@ -311,7 +318,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 6. CLOSING CTA BANNER */}
+      {/* 6. PENDAFTARAN ANGGOTA DI BERANDA */}
+      <section id="daftar-anggota" className="border-t border-[#e7deda] bg-white py-20">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <MemberRegistrationForm />
+        </div>
+      </section>
+
+      {/* 7. CLOSING CTA BANNER */}
       <section className="bg-gradient-to-r from-[#ff491a] via-[#d9390f] to-[#090909] py-16 text-white">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 px-4 sm:px-6 lg:flex-row lg:items-center lg:px-8">
           <div className="max-w-2xl">

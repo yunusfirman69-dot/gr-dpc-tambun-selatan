@@ -3,6 +3,14 @@ import { cookies } from "next/headers";
 
 export const ADMIN_COOKIE_NAME = "pgr_admin_session";
 
+export type AdminRole = "super_admin" | "editor";
+
+export interface AdminSession {
+  email: string;
+  role: AdminRole;
+  name?: string;
+}
+
 function getSecret(): string {
   return process.env.ADMIN_SESSION_SECRET || "pgr-tambun-selatan-dev-secret-key";
 }
@@ -14,9 +22,75 @@ export function getAdminCredentials() {
   };
 }
 
-export function signSessionToken(email: string): string {
+export async function hashPassword(password: string): Promise<string> {
+  const saltBytes = crypto.randomBytes(16);
+  const saltHex = saltBytes.toString("hex");
+  const keyMaterial = await crypto.webcrypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
+  const derived = await crypto.webcrypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt: saltBytes,
+      iterations: 100000,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    256
+  );
+  const hashHex = Buffer.from(derived).toString("hex");
+  return `${saltHex}:${hashHex}`;
+}
+
+export async function verifyPassword(
+  password: string,
+  storedHash: string
+): Promise<boolean> {
+  const parts = storedHash.split(":");
+  if (parts.length !== 2) return false;
+  const [saltHex, expectedHex] = parts;
+  if (!saltHex || !expectedHex) return false;
+
+  const saltBytes = Buffer.from(saltHex, "hex");
+  const keyMaterial = await crypto.webcrypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
+  const derived = await crypto.webcrypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt: saltBytes,
+      iterations: 100000,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    256
+  );
+  const actualBuf = Buffer.from(derived);
+  const expectedBuf = Buffer.from(expectedHex, "hex");
+  if (actualBuf.length !== expectedBuf.length) return false;
+  return crypto.timingSafeEqual(actualBuf, expectedBuf);
+}
+
+export function signSessionToken(
+  email: string,
+  role: AdminRole = "super_admin",
+  name?: string
+): string {
   const payload = Buffer.from(
-    JSON.stringify({ email, exp: Date.now() + 1000 * 60 * 60 * 24 })
+    JSON.stringify({
+      email,
+      role,
+      name,
+      exp: Date.now() + 1000 * 60 * 60 * 24,
+    })
   ).toString("base64url");
   const sig = crypto
     .createHmac("sha256", getSecret())
@@ -25,7 +99,9 @@ export function signSessionToken(email: string): string {
   return `${payload}.${sig}`;
 }
 
-export function verifySessionToken(token: string | undefined): { email: string } | null {
+export function verifySessionToken(
+  token: string | undefined
+): AdminSession | null {
   if (!token || !token.includes(".")) return null;
   const [payload, sig] = token.split(".");
   if (!payload || !sig) return null;
@@ -43,17 +119,21 @@ export function verifySessionToken(token: string | undefined): { email: string }
   try {
     const decoded = JSON.parse(
       Buffer.from(payload, "base64url").toString("utf-8")
-    ) as { email?: string; exp?: number };
+    ) as { email?: string; role?: AdminRole; name?: string; exp?: number };
     if (!decoded.email || !decoded.exp || decoded.exp < Date.now()) {
       return null;
     }
-    return { email: decoded.email };
+    return {
+      email: decoded.email,
+      role: decoded.role || "super_admin",
+      name: decoded.name,
+    };
   } catch {
     return null;
   }
 }
 
-export async function getAdminSession() {
+export async function getAdminSession(): Promise<AdminSession | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
   return verifySessionToken(token);

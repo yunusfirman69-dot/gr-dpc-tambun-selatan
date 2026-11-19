@@ -13,6 +13,7 @@ const adminNav = [
   { href: "/admin/pengurus", label: "Kelola Pengurus" },
   { href: "/admin/kontak", label: "Kelola Kontak" },
   { href: "/admin/anggota", label: "Data Anggota (Privat)" },
+  { href: "/admin/pengaturan", label: "Pengaturan Admin" },
 ];
 
 export default function AdminShell({

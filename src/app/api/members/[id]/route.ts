@@ -3,6 +3,7 @@ import path from "path";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin-auth";
 import { deleteMemberData, getMembersData } from "@/lib/content-store";
+import { getConvexClient } from "@/lib/convex-client";
 
 export async function DELETE(
   _request: Request,
@@ -27,7 +28,7 @@ export async function DELETE(
     );
   }
 
-  if (existing?.ktpFileName) {
+  if (!getConvexClient() && existing?.ktpFileName) {
     const safeName = path.basename(existing.ktpFileName);
     const ktpPath = path.join(
       process.cwd(),

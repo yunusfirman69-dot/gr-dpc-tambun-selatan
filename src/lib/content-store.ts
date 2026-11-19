@@ -12,13 +12,16 @@ import {
   type OfficialItem,
   type ProgramField,
 } from "@/data/placeholder";
+import { convexApi, getConvexClient } from "@/lib/convex-client";
 
 export interface StoredNewsPost extends NewsPost {
   imageUrl?: string;
+  imageStorageId?: string;
 }
 
 export interface StoredGalleryItem extends GalleryItem {
   imageUrl?: string;
+  imageStorageId?: string;
 }
 
 export interface StoredOfficialItem extends OfficialItem {
@@ -98,8 +101,6 @@ async function readStore(): Promise<ContentStoreData> {
       members: Array.isArray(parsed.members) ? parsed.members : [],
     };
   } catch {
-    // Di lingkungan serverless/read-only (seperti Cloudflare Workers),
-    // kembalikan data bawaan tanpa mencoba menulis ke disk.
     return getInitialData();
   }
 }
@@ -120,7 +121,20 @@ export function createSlug(title: string): string {
   return `${base || "berita"}-${suffix}`;
 }
 
+// === NEWS ===
 export async function getNewsPosts(): Promise<StoredNewsPost[]> {
+  const convex = getConvexClient();
+  if (convex) {
+    try {
+      const rows = (await convex.query(
+        convexApi.content.listNews,
+        {}
+      )) as StoredNewsPost[];
+      return rows.length > 0 ? rows : newsPlaceholder;
+    } catch {
+      return newsPlaceholder;
+    }
+  }
   const store = await readStore();
   return store.news;
 }
@@ -128,6 +142,18 @@ export async function getNewsPosts(): Promise<StoredNewsPost[]> {
 export async function getNewsBySlug(
   slug: string
 ): Promise<StoredNewsPost | undefined> {
+  const convex = getConvexClient();
+  if (convex) {
+    try {
+      const row = (await convex.query(convexApi.content.getNewsBySlug, {
+        slug,
+      })) as StoredNewsPost | null;
+      if (row) return row;
+      return newsPlaceholder.find((item) => item.slug === slug);
+    } catch {
+      return newsPlaceholder.find((item) => item.slug === slug);
+    }
+  }
   const store = await readStore();
   return store.news.find((item) => item.slug === slug);
 }
@@ -135,17 +161,38 @@ export async function getNewsBySlug(
 export async function addNewsPost(
   post: Omit<StoredNewsPost, "slug"> & { slug?: string }
 ): Promise<StoredNewsPost> {
+  const slug = post.slug || createSlug(post.title);
+  const convex = getConvexClient();
+  if (convex) {
+    const created = (await convex.mutation(convexApi.content.addNews, {
+      slug,
+      title: post.title,
+      category: post.category,
+      publishedAt: post.publishedAt,
+      excerpt: post.excerpt,
+      content: post.content,
+      author: post.author,
+      imageUrl: post.imageUrl,
+      imageStorageId: post.imageStorageId,
+    })) as StoredNewsPost;
+    return created;
+  }
+
   const store = await readStore();
-  const newPost: StoredNewsPost = {
-    ...post,
-    slug: post.slug || createSlug(post.title),
-  };
+  const newPost: StoredNewsPost = { ...post, slug };
   store.news = [newPost, ...store.news];
   await writeStore(store);
   return newPost;
 }
 
 export async function deleteNewsPost(slug: string): Promise<boolean> {
+  const convex = getConvexClient();
+  if (convex) {
+    return (await convex.mutation(convexApi.content.deleteNews, {
+      slug,
+    })) as boolean;
+  }
+
   const store = await readStore();
   const before = store.news.length;
   store.news = store.news.filter((item) => item.slug !== slug);
@@ -154,7 +201,20 @@ export async function deleteNewsPost(slug: string): Promise<boolean> {
   return true;
 }
 
+// === GALLERY ===
 export async function getGalleryItems(): Promise<StoredGalleryItem[]> {
+  const convex = getConvexClient();
+  if (convex) {
+    try {
+      const rows = (await convex.query(
+        convexApi.content.listGallery,
+        {}
+      )) as StoredGalleryItem[];
+      return rows.length > 0 ? rows : galleryPlaceholder;
+    } catch {
+      return galleryPlaceholder;
+    }
+  }
   const store = await readStore();
   return store.gallery;
 }
@@ -162,6 +222,19 @@ export async function getGalleryItems(): Promise<StoredGalleryItem[]> {
 export async function addGalleryItem(
   item: Omit<StoredGalleryItem, "id">
 ): Promise<StoredGalleryItem> {
+  const convex = getConvexClient();
+  if (convex) {
+    const created = (await convex.mutation(convexApi.content.addGallery, {
+      title: item.title,
+      category: item.category,
+      date: item.date,
+      description: item.description,
+      imageUrl: item.imageUrl,
+      imageStorageId: item.imageStorageId,
+    })) as StoredGalleryItem;
+    return created;
+  }
+
   const store = await readStore();
   const newItem: StoredGalleryItem = {
     ...item,
@@ -173,6 +246,13 @@ export async function addGalleryItem(
 }
 
 export async function deleteGalleryItem(id: string): Promise<boolean> {
+  const convex = getConvexClient();
+  if (convex) {
+    return (await convex.mutation(convexApi.content.deleteGallery, {
+      id,
+    })) as boolean;
+  }
+
   const store = await readStore();
   const before = store.gallery.length;
   store.gallery = store.gallery.filter((item) => item.id !== id);
@@ -181,7 +261,20 @@ export async function deleteGalleryItem(id: string): Promise<boolean> {
   return true;
 }
 
+// === PROGRAM KERJA ===
 export async function getProgramKerjaData(): Promise<StoredProgramKerja> {
+  const convex = getConvexClient();
+  if (convex) {
+    try {
+      const row = (await convex.query(
+        convexApi.content.getProgramKerja,
+        {}
+      )) as StoredProgramKerja | null;
+      return row ?? programKerjaResmi;
+    } catch {
+      return programKerjaResmi;
+    }
+  }
   const store = await readStore();
   return store.programKerja;
 }
@@ -189,13 +282,34 @@ export async function getProgramKerjaData(): Promise<StoredProgramKerja> {
 export async function saveProgramKerjaData(
   programKerja: StoredProgramKerja
 ): Promise<StoredProgramKerja> {
+  const convex = getConvexClient();
+  if (convex) {
+    return (await convex.mutation(
+      convexApi.content.saveProgramKerja,
+      programKerja
+    )) as StoredProgramKerja;
+  }
+
   const store = await readStore();
   store.programKerja = programKerja;
   await writeStore(store);
   return store.programKerja;
 }
 
+// === OFFICIALS ===
 export async function getOfficialsData(): Promise<StoredOfficialItem[]> {
+  const convex = getConvexClient();
+  if (convex) {
+    try {
+      const rows = (await convex.query(
+        convexApi.content.listOfficials,
+        {}
+      )) as StoredOfficialItem[];
+      return rows.length > 0 ? rows : officialsPlaceholder;
+    } catch {
+      return officialsPlaceholder;
+    }
+  }
   const store = await readStore();
   return store.officials;
 }
@@ -203,13 +317,33 @@ export async function getOfficialsData(): Promise<StoredOfficialItem[]> {
 export async function saveOfficialsData(
   officials: StoredOfficialItem[]
 ): Promise<StoredOfficialItem[]> {
+  const convex = getConvexClient();
+  if (convex) {
+    return (await convex.mutation(convexApi.content.saveOfficials, {
+      officials,
+    })) as StoredOfficialItem[];
+  }
+
   const store = await readStore();
   store.officials = officials;
   await writeStore(store);
   return store.officials;
 }
 
+// === CONTACT ===
 export async function getContactData(): Promise<StoredContactInfo> {
+  const convex = getConvexClient();
+  if (convex) {
+    try {
+      const row = (await convex.query(
+        convexApi.content.getContact,
+        {}
+      )) as StoredContactInfo | null;
+      return row ?? organizationInfo.contact;
+    } catch {
+      return organizationInfo.contact;
+    }
+  }
   const store = await readStore();
   return store.contact;
 }
@@ -217,13 +351,33 @@ export async function getContactData(): Promise<StoredContactInfo> {
 export async function saveContactData(
   contact: StoredContactInfo
 ): Promise<StoredContactInfo> {
+  const convex = getConvexClient();
+  if (convex) {
+    return (await convex.mutation(
+      convexApi.content.saveContact,
+      contact
+    )) as StoredContactInfo;
+  }
+
   const store = await readStore();
   store.contact = contact;
   await writeStore(store);
   return store.contact;
 }
 
+// === MEMBERS ===
 export async function getMembersData(): Promise<StoredMemberItem[]> {
+  const convex = getConvexClient();
+  if (convex) {
+    try {
+      return (await convex.query(
+        convexApi.members.listMembers,
+        {}
+      )) as StoredMemberItem[];
+    } catch {
+      return [];
+    }
+  }
   const store = await readStore();
   return store.members;
 }
@@ -231,17 +385,33 @@ export async function getMembersData(): Promise<StoredMemberItem[]> {
 export async function addMemberData(
   member: Omit<StoredMemberItem, "id" | "createdAt">
 ): Promise<StoredMemberItem> {
+  const createdAt = new Intl.DateTimeFormat("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date());
+
+  const convex = getConvexClient();
+  if (convex) {
+    const id = (await convex.mutation(convexApi.members.addMember, {
+      fullName: member.fullName,
+      nik: member.nik,
+      phone: member.phone,
+      email: member.email,
+      village: member.village,
+      ktpStorageId: member.ktpFileName,
+      createdAt,
+    })) as string;
+    return { ...member, id, createdAt };
+  }
+
   const store = await readStore();
   const created: StoredMemberItem = {
     ...member,
     id: `mbr-${Date.now()}`,
-    createdAt: new Intl.DateTimeFormat("id-ID", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date()),
+    createdAt,
   };
   store.members = [created, ...store.members];
   await writeStore(store);
@@ -249,6 +419,13 @@ export async function addMemberData(
 }
 
 export async function deleteMemberData(id: string): Promise<boolean> {
+  const convex = getConvexClient();
+  if (convex) {
+    return (await convex.mutation(convexApi.members.deleteMember, {
+      id,
+    })) as boolean;
+  }
+
   const store = await readStore();
   const before = store.members.length;
   store.members = store.members.filter((item) => item.id !== id);

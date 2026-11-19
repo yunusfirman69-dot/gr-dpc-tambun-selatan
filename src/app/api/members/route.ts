@@ -3,6 +3,10 @@ import path from "path";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin-auth";
 import { addMemberData, getMembersData } from "@/lib/content-store";
+import {
+  getConvexClient,
+  uploadFileToConvexStorage,
+} from "@/lib/convex-client";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES: Record<string, string> = {
@@ -86,6 +90,27 @@ export async function POST(request: Request) {
       );
     }
 
+    if (getConvexClient()) {
+      const { storageId } = await uploadFileToConvexStorage(ktpFile);
+      await addMemberData({
+        fullName,
+        nik,
+        phone,
+        email,
+        village: village || "Tambun Selatan",
+        ktpFileName: storageId,
+      });
+
+      return NextResponse.json(
+        {
+          ok: true,
+          message:
+            "Pendaftaran anggota berhasil diterima dan disimpan secara privat untuk verifikasi pengurus.",
+        },
+        { status: 201 }
+      );
+    }
+
     const bytes = await ktpFile.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -124,7 +149,26 @@ export async function POST(request: Request) {
       },
       { status: 201 }
     );
-  } catch {
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "";
+    const causeMsg =
+      err instanceof Error && err.cause instanceof Error ? err.cause.message : "";
+    const fullErr = `${message} ${causeMsg}`;
+
+    if (
+      fullErr.includes("UNABLE_TO_GET_ISSUER_CERT") ||
+      fullErr.includes("certificate") ||
+      fullErr.includes("fetch failed")
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Koneksi SSL ke Convex terblokir sertifikat Windows. Jalankan `$env:NODE_OPTIONS = \"--use-system-ca\"` sebelum `npm run dev`.",
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Gagal memproses pendaftaran anggota." },
       { status: 500 }

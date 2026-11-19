@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       date?: string;
       description?: string;
       imageUrl?: string;
+      imageStorageId?: string;
     };
 
     const title = body.title?.trim() || "";
@@ -36,8 +37,9 @@ export async function POST(request: Request) {
       }).format(new Date());
     const description = body.description?.trim() || "";
     const imageUrl = body.imageUrl?.trim() || "";
+    const imageStorageId = body.imageStorageId?.trim() || undefined;
 
-    if (!title || !imageUrl) {
+    if (!title || (!imageUrl && !imageStorageId)) {
       return NextResponse.json(
         { error: "Judul kegiatan dan file foto wajib diisi." },
         { status: 400 }
@@ -50,6 +52,7 @@ export async function POST(request: Request) {
       date,
       description,
       imageUrl,
+      imageStorageId,
     });
 
     revalidatePath("/galeri");

@@ -35,14 +35,19 @@ export default function AdminNewsManager({
 
     try {
       let imageUrl: string | undefined;
+      let imageStorageId: string | undefined;
 
       if (file) {
         const fd = new FormData();
         fd.append("file", file);
         fd.append("folder", "news");
         const upRes = await fetch("/api/upload", { method: "POST", body: fd });
-        const upData = (await upRes.json()) as { url?: string; error?: string };
-        if (!upRes.ok || !upData.url) {
+        const upData = (await upRes.json()) as {
+          url?: string;
+          storageId?: string;
+          error?: string;
+        };
+        if (!upRes.ok || (!upData.url && !upData.storageId)) {
           setMessage({
             type: "err",
             text: upData.error || "Gagal mengunggah gambar cover.",
@@ -51,6 +56,7 @@ export default function AdminNewsManager({
           return;
         }
         imageUrl = upData.url;
+        imageStorageId = upData.storageId;
       }
 
       const res = await fetch("/api/news", {
@@ -63,6 +69,7 @@ export default function AdminNewsManager({
           excerpt,
           content,
           imageUrl,
+          imageStorageId,
         }),
       });
 
