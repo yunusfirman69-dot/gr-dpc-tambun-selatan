@@ -1,10 +1,10 @@
-import { connection } from "next/server";
 import { Suspense } from "react";
 import PageHeader from "@/components/PageHeader";
 import { getProgramKerjaData } from "@/lib/content-store";
 
+export const dynamic = "force-dynamic";
+
 async function ProgramKerjaContent() {
-  await connection();
   const programKerja = await getProgramKerjaData();
 
   return (

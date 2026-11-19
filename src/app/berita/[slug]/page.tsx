@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 import { Suspense } from "react";
 import { getNewsBySlug } from "@/lib/content-store";
+
+export const dynamic = "force-dynamic";
 
 async function BeritaDetailContent({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  await connection();
   const { slug } = await params;
   const post = await getNewsBySlug(slug);
 

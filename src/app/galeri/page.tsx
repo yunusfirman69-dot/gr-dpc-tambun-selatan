@@ -1,10 +1,10 @@
-import { connection } from "next/server";
 import { Suspense } from "react";
 import PageHeader from "@/components/PageHeader";
 import { getGalleryItems } from "@/lib/content-store";
 
+export const dynamic = "force-dynamic";
+
 async function GaleriGrid() {
-  await connection();
   const items = await getGalleryItems();
 
   return (

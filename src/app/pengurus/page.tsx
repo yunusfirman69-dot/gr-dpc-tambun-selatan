@@ -1,11 +1,11 @@
-import { connection } from "next/server";
 import { Suspense } from "react";
 import PageHeader from "@/components/PageHeader";
 import { getOfficialsData } from "@/lib/content-store";
 import { getOfficialPhotoClasses } from "@/lib/photo-format";
 
+export const dynamic = "force-dynamic";
+
 async function PengurusGrid() {
-  await connection();
   const officials = await getOfficialsData();
 
   return (

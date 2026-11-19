@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { connection } from "next/server";
 import { Suspense } from "react";
 import MemberRegistrationForm from "@/components/MemberRegistrationForm";
 import {
@@ -10,8 +9,9 @@ import {
 } from "@/data/placeholder";
 import { getNewsPosts } from "@/lib/content-store";
 
+export const dynamic = "force-dynamic";
+
 async function LatestNewsGrid() {
-  await connection();
   const posts = (await getNewsPosts()).slice(0, 3);
 
   return (

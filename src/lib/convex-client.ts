@@ -9,7 +9,11 @@ export function getConvexUrl(): string | null {
 export function getConvexClient(): ConvexHttpClient | null {
   const url = getConvexUrl();
   if (!url) return null;
-  return new ConvexHttpClient(url);
+  try {
+    return new ConvexHttpClient(url);
+  } catch {
+    return null;
+  }
 }
 
 export const convexApi = anyApi;

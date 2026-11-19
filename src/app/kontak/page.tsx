@@ -1,12 +1,12 @@
-import { connection } from "next/server";
 import { Suspense } from "react";
 import ContactForm from "@/components/ContactForm";
 import MemberRegistrationForm from "@/components/MemberRegistrationForm";
 import PageHeader from "@/components/PageHeader";
 import { getContactData } from "@/lib/content-store";
 
+export const dynamic = "force-dynamic";
+
 async function KontakContent() {
-  await connection();
   const contact = await getContactData();
 
   return (

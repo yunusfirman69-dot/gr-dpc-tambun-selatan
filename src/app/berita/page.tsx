@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { connection } from "next/server";
 import { Suspense } from "react";
 import PageHeader from "@/components/PageHeader";
 import { getNewsPosts } from "@/lib/content-store";
 
+export const dynamic = "force-dynamic";
+
 async function BeritaList() {
-  await connection();
   const posts = await getNewsPosts();
 
   return (
