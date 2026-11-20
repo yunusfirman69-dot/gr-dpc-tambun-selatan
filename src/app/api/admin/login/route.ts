@@ -40,9 +40,25 @@ export async function POST(request: Request) {
           email: string;
           passwordHash: string;
           role: AdminRole;
+          status?: "pending" | "approved" | "rejected";
         } | null;
 
         if (adminRow && (await verifyPassword(password, adminRow.passwordHash))) {
+          if (adminRow.status === "pending") {
+            return NextResponse.json(
+              {
+                error:
+                  "Akun admin Anda masih menunggu persetujuan dari gerakanrakyattamsel@gmail.com.",
+              },
+              { status: 403 }
+            );
+          }
+          if (adminRow.status === "rejected") {
+            return NextResponse.json(
+              { error: "Permintaan akun admin Anda tidak disetujui." },
+              { status: 403 }
+            );
+          }
           authenticated = true;
           role = adminRow.role;
           name = adminRow.fullName;

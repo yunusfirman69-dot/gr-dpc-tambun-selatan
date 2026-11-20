@@ -3,6 +3,7 @@ import {
   ADMIN_COOKIE_NAME,
   getAdminSession,
   hashPassword,
+  PRIMARY_APPROVER_EMAIL,
   signSessionToken,
   type AdminRole,
 } from "@/lib/admin-auth";
@@ -24,8 +25,9 @@ export async function GET() {
   return NextResponse.json({
     convexReady: Boolean(convex),
     hasAdmins: adminCount > 0,
-    isSuperAdmin: session?.role === "super_admin",
-    hasInviteCodeConfigured: Boolean(process.env.ADMIN_INVITE_CODE),
+    isPrimaryApprover:
+      session?.email.toLowerCase() === PRIMARY_APPROVER_EMAIL.toLowerCase(),
+    approverEmail: PRIMARY_APPROVER_EMAIL,
   });
 }
 
@@ -44,13 +46,11 @@ export async function POST(request: Request) {
       email?: string;
       password?: string;
       role?: AdminRole;
-      inviteCode?: string;
     };
 
     const fullName = body.fullName?.trim() || "";
     const email = body.email?.trim().toLowerCase() || "";
     const password = body.password || "";
-    const inviteCode = body.inviteCode?.trim() || "";
 
     if (!fullName || !email || !password) {
       return NextResponse.json(
@@ -79,26 +79,19 @@ export async function POST(request: Request) {
       {}
     )) as number;
 
-    if (adminCount >= 1) {
-      return NextResponse.json(
-        {
-          error:
-            "Pendaftaran admin ditutup. Hanya 1 akun admin utama yang diizinkan; silakan daftar atau login sebagai anggota.",
-        },
-        { status: 403 }
-      );
-    }
+    const isPrimaryApproverSession =
+      session?.email.toLowerCase() === PRIMARY_APPROVER_EMAIL.toLowerCase();
+    const isInitialPrimarySetup =
+      adminCount === 0 && email === PRIMARY_APPROVER_EMAIL.toLowerCase();
 
-    const configuredInvite = process.env.ADMIN_INVITE_CODE?.trim();
-    const inviteValid = Boolean(configuredInvite && inviteCode === configuredInvite);
-    if (configuredInvite && !inviteValid) {
-      return NextResponse.json(
-        { error: "Kode undangan admin tidak sesuai." },
-        { status: 403 }
-      );
-    }
-
-    const assignedRole: AdminRole = "super_admin";
+    const shouldAutoApprove = isInitialPrimarySetup || isPrimaryApproverSession;
+    const assignedStatus = shouldAutoApprove ? "approved" : "pending";
+    const assignedRole: AdminRole = isInitialPrimarySetup
+      ? "super_admin"
+      : isPrimaryApproverSession &&
+          (body.role === "super_admin" || body.role === "editor")
+        ? body.role
+        : "editor";
 
     const createdAt = new Intl.DateTimeFormat("id-ID", {
       day: "2-digit",
@@ -113,20 +106,36 @@ export async function POST(request: Request) {
       email,
       passwordHash,
       role: assignedRole,
+      status: assignedStatus,
       createdAt,
     })) as {
       id: string;
       fullName: string;
       email: string;
       role: AdminRole;
+      status: "pending" | "approved" | "rejected";
       createdAt: string;
     };
 
-    const response = NextResponse.json({ ok: true, admin: created }, { status: 201 });
+    const response = NextResponse.json(
+      {
+        ok: true,
+        pending: assignedStatus === "pending",
+        message:
+          assignedStatus === "pending"
+            ? `Permintaan registrasi dikirim! Akun Anda menunggu persetujuan dari ${PRIMARY_APPROVER_EMAIL} sebelum bisa login.`
+            : "Akun admin berhasil didaftarkan dan langsung aktif.",
+        admin: created,
+      },
+      { status: 201 }
+    );
 
-    // Jika pendaftaran pertama (belum ada sesi), langsung login otomatis
-    if (!session) {
-      const token = signSessionToken(created.email, created.role, created.fullName);
+    if (isInitialPrimarySetup && !session) {
+      const token = signSessionToken(
+        created.email,
+        created.role,
+        created.fullName
+      );
       response.cookies.set(ADMIN_COOKIE_NAME, token, {
         httpOnly: true,
         sameSite: "lax",
@@ -144,7 +153,7 @@ export async function POST(request: Request) {
 
     if (fullErr.includes("EMAIL_EXISTS")) {
       return NextResponse.json(
-        { error: "Email tersebut sudah terdaftar sebagai admin." },
+        { error: "Email tersebut sudah terdaftar atau sedang menunggu persetujuan." },
         { status: 409 }
       );
     }
@@ -165,7 +174,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            "Fungsi Convex belum di-deploy. Jalankan `npx convex deploy` di terminal terlebih dahulu.",
+            "Fungsi Convex belum di-deploy. Jalankan `npx convex dev --once` di terminal terlebih dahulu.",
         },
         { status: 500 }
       );

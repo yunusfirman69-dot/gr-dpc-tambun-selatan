@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAdminSession } from "@/lib/admin-auth";
+import { getAdminSession, PRIMARY_APPROVER_EMAIL } from "@/lib/admin-auth";
 import { convexApi, getConvexClient } from "@/lib/convex-client";
 
 export async function GET() {
@@ -21,11 +21,71 @@ export async function GET() {
   }
 }
 
+export async function PATCH(request: Request) {
+  const session = await getAdminSession();
+  if (
+    !session ||
+    session.email.toLowerCase() !== PRIMARY_APPROVER_EMAIL.toLowerCase()
+  ) {
+    return NextResponse.json(
+      {
+        error: `Hanya admin ${PRIMARY_APPROVER_EMAIL} yang dapat menyetujui atau menolak pendaftaran admin.`,
+      },
+      { status: 403 }
+    );
+  }
+
+  const convex = getConvexClient();
+  if (!convex) {
+    return NextResponse.json(
+      { error: "Convex belum dikonfigurasi." },
+      { status: 503 }
+    );
+  }
+
+  try {
+    const { id, status } = (await request.json()) as {
+      id?: string;
+      status?: "approved" | "rejected";
+    };
+
+    if (!id || (status !== "approved" && status !== "rejected")) {
+      return NextResponse.json(
+        { error: "ID admin dan status (approved/rejected) wajib diisi." },
+        { status: 400 }
+      );
+    }
+
+    const updated = await convex.mutation(convexApi.admins.updateAdminStatus, {
+      id,
+      status,
+    });
+
+    if (!updated) {
+      return NextResponse.json(
+        { error: "Akun admin tidak ditemukan." },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ ok: true, admin: updated });
+  } catch {
+    return NextResponse.json(
+      { error: "Gagal memperbarui status persetujuan admin." },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(request: Request) {
   const session = await getAdminSession();
-  if (!session || session.role !== "super_admin") {
+  if (
+    !session ||
+    (session.email.toLowerCase() !== PRIMARY_APPROVER_EMAIL.toLowerCase() &&
+      session.role !== "super_admin")
+  ) {
     return NextResponse.json(
-      { error: "Hanya Super Admin yang dapat menghapus akun admin." },
+      { error: `Hanya ${PRIMARY_APPROVER_EMAIL} yang dapat menghapus akun admin.` },
       { status: 403 }
     );
   }

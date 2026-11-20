@@ -4,7 +4,7 @@ import AdminAccountsManager, {
   type AdminAccountRow,
 } from "@/components/AdminAccountsManager";
 import AdminShell from "@/components/AdminShell";
-import { getAdminSession } from "@/lib/admin-auth";
+import { getAdminSession, PRIMARY_APPROVER_EMAIL } from "@/lib/admin-auth";
 import { convexApi, getConvexClient } from "@/lib/convex-client";
 
 async function AdminPengaturanContent() {
@@ -26,12 +26,15 @@ async function AdminPengaturanContent() {
     }
   }
 
+  const isPrimaryApprover =
+    session.email.toLowerCase() === PRIMARY_APPROVER_EMAIL.toLowerCase();
+
   return (
     <AdminShell email={session.email}>
       <AdminAccountsManager
         initialAdmins={admins}
         currentUserEmail={session.email}
-        isSuperAdmin={session.role === "super_admin"}
+        isPrimaryApprover={isPrimaryApprover}
       />
     </AdminShell>
   );
