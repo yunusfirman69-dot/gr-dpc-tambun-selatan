@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 
 export const ADMIN_COOKIE_NAME = "pgr_admin_session";
 export const MEMBER_COOKIE_NAME = "pgr_member_session";
+export const PRIMARY_APPROVER_EMAIL = "gerakanrakyattamsel@gmail.com";
 
 export type AdminRole = "super_admin" | "editor";
 

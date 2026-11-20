@@ -131,6 +131,13 @@ export default defineSchema({
     email: v.string(),
     passwordHash: v.string(),
     role: v.union(v.literal("super_admin"), v.literal("editor")),
+    status: v.optional(
+      v.union(
+        v.literal("pending"),
+        v.literal("approved"),
+        v.literal("rejected")
+      )
+    ),
     createdAt: v.string(),
   }).index("by_email", ["email"]),
 });

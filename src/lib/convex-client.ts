@@ -84,6 +84,7 @@ export const convexApi = {
     getAdminByEmail: "admins:getAdminByEmail",
     listAdmins: "admins:listAdmins",
     createAdmin: "admins:createAdmin",
+    updateAdminStatus: "admins:updateAdminStatus",
     deleteAdmin: "admins:deleteAdmin",
   },
 } as const;

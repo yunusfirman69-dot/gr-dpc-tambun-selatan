@@ -23,6 +23,7 @@ export const getAdminByEmail = query({
       email: row.email,
       passwordHash: row.passwordHash,
       role: row.role,
+      status: row.status ?? "approved",
       createdAt: row.createdAt,
     };
   },
@@ -37,6 +38,7 @@ export const listAdmins = query({
       fullName: row.fullName,
       email: row.email,
       role: row.role,
+      status: row.status ?? "approved",
       createdAt: row.createdAt,
     }));
   },
@@ -48,14 +50,14 @@ export const createAdmin = mutation({
     email: v.string(),
     passwordHash: v.string(),
     role: v.union(v.literal("super_admin"), v.literal("editor")),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("rejected")
+    ),
     createdAt: v.string(),
   },
   handler: async (ctx, args) => {
-    const allAdmins = await ctx.db.query("admins").collect();
-    if (allAdmins.length >= 1) {
-      throw new Error("ADMIN_LIMIT_REACHED");
-    }
-
     const normalizedEmail = args.email.toLowerCase().trim();
     const existing = await ctx.db
       .query("admins")
@@ -71,6 +73,7 @@ export const createAdmin = mutation({
       email: normalizedEmail,
       passwordHash: args.passwordHash,
       role: args.role,
+      status: args.status,
       createdAt: args.createdAt,
     });
 
@@ -79,7 +82,28 @@ export const createAdmin = mutation({
       fullName: args.fullName.trim(),
       email: normalizedEmail,
       role: args.role,
+      status: args.status,
       createdAt: args.createdAt,
+    };
+  },
+});
+
+export const updateAdminStatus = mutation({
+  args: {
+    id: v.id("admins"),
+    status: v.union(v.literal("approved"), v.literal("rejected")),
+  },
+  handler: async (ctx, args) => {
+    const target = await ctx.db.get(args.id);
+    if (!target) return null;
+    await ctx.db.patch(args.id, { status: args.status });
+    return {
+      id: target._id,
+      fullName: target.fullName,
+      email: target.email,
+      role: target.role,
+      status: args.status,
+      createdAt: target.createdAt,
     };
   },
 });
