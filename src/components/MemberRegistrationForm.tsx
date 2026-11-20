@@ -5,6 +5,55 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useRef, useState } from "react";
 import { organizationInfo } from "@/data/placeholder";
 
+async function compressKtpImage(file: File): Promise<File> {
+  if (file.size <= 900 * 1024 && file.type !== "image/heic" && file.type !== "image/heif") {
+    return file;
+  }
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const maxWidth = 1600;
+      const scale = img.width > maxWidth ? maxWidth / img.width : 1;
+      const targetWidth = Math.round(img.width * scale);
+      const targetHeight = Math.round(img.height * scale);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        resolve(file);
+        return;
+      }
+
+      ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            resolve(file);
+            return;
+          }
+          const compressedName = file.name.replace(/\.[^.]+$/, "") + ".jpg";
+          resolve(new File([blob], compressedName, { type: "image/jpeg" }));
+        },
+        "image/jpeg",
+        0.82
+      );
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(file);
+    };
+
+    img.src = objectUrl;
+  });
+}
+
 export default function MemberRegistrationForm() {
   const router = useRouter();
   const cardTopRef = useRef<HTMLDivElement>(null);
@@ -48,6 +97,8 @@ export default function MemberRegistrationForm() {
 
     setSubmitting(true);
     try {
+      const optimizedKtp = await compressKtpImage(ktpFile);
+
       const fd = new FormData();
       fd.append("fullName", fullName);
       fd.append("nik", nik);
@@ -56,7 +107,7 @@ export default function MemberRegistrationForm() {
       fd.append("password", password);
       fd.append("village", village);
       fd.append("consent", String(consent));
-      fd.append("ktpFile", ktpFile);
+      fd.append("ktpFile", optimizedKtp);
 
       const res = await fetch("/api/members", {
         method: "POST",

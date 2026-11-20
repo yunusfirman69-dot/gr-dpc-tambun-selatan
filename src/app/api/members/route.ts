@@ -190,8 +190,32 @@ export async function POST(request: Request) {
       );
     }
 
+    if (
+      fullErr.includes("ArgumentValidationError") ||
+      fullErr.includes("Could not find public function")
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Skema database Convex belum diperbarui. Jalankan `npx convex deploy` terlebih dahulu.",
+        },
+        { status: 500 }
+      );
+    }
+
+    if (fullErr.includes("Convex Storage")) {
+      return NextResponse.json(
+        { error: "Gagal mengunggah foto KTP ke penyimpanan Convex." },
+        { status: 502 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Gagal memproses pendaftaran anggota." },
+      {
+        error: message
+          ? `Gagal memproses pendaftaran anggota: ${message}`
+          : "Gagal memproses pendaftaran anggota.",
+      },
       { status: 500 }
     );
   }
