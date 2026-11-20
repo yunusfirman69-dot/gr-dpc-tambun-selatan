@@ -8,12 +8,14 @@ import {
   uploadFileToConvexStorage,
 } from "@/lib/convex-client";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": ".jpg",
   "image/jpg": ".jpg",
   "image/png": ".png",
   "image/webp": ".webp",
+  "image/heic": ".heic",
+  "image/heif": ".heif",
 };
 
 export async function GET() {
@@ -86,14 +88,14 @@ export async function POST(request: Request) {
     const ext = ALLOWED_TYPES[ktpFile.type];
     if (!ext) {
       return NextResponse.json(
-        { error: "Format foto KTP harus JPG, PNG, atau WEBP." },
+        { error: "Format foto KTP harus JPG, PNG, WEBP, atau HEIC." },
         { status: 400 }
       );
     }
 
     if (ktpFile.size > MAX_FILE_SIZE) {
       return NextResponse.json(
-        { error: "Ukuran foto KTP maksimal 5 MB." },
+        { error: "Ukuran foto KTP maksimal 10 MB." },
         { status: 400 }
       );
     }
