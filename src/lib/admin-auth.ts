@@ -22,11 +22,11 @@ function getSecret(): string {
   return process.env.ADMIN_SESSION_SECRET || "pgr-tambun-selatan-dev-secret-key";
 }
 
-export function getAdminCredentials() {
-  return {
-    email: process.env.ADMIN_EMAIL || "admin@tambunselatan.local",
-    password: process.env.ADMIN_PASSWORD || "GerakanRakyat2026!",
-  };
+export function getAdminCredentials(): { email: string; password: string } | null {
+  const email = process.env.ADMIN_EMAIL?.trim();
+  const password = process.env.ADMIN_PASSWORD;
+  if (!email || !password) return null;
+  return { email, password };
 }
 
 export async function hashPassword(password: string): Promise<string> {

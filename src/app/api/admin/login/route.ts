@@ -52,10 +52,11 @@ export async function POST(request: Request) {
       }
     }
 
-    // 2. Fallback ke kredensial environment variable / default lokal
+    // 2. Fallback ke kredensial environment variable jika diset secara eksplisit
     if (!authenticated) {
       const expected = getAdminCredentials();
       if (
+        expected &&
         email === expected.email.toLowerCase() &&
         password === expected.password
       ) {

@@ -81,7 +81,7 @@ export default function AdminLoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@tambunselatan.local"
+              placeholder="email-admin@anda.com"
               className="mt-1.5 w-full rounded-xl border border-neutral-700 bg-[#090909] px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#ff491a]"
             />
           </div>
@@ -108,16 +108,6 @@ export default function AdminLoginPage() {
             {loading ? "Memproses..." : "Masuk ke Dashboard"}
           </button>
         </form>
-
-        <div className="mt-6 rounded-2xl border border-neutral-800 bg-[#090909] p-4 text-xs leading-relaxed text-neutral-400">
-          <p className="font-bold text-[#ffc3b3]">Akun Uji Lokal (Sementara):</p>
-          <p className="mt-1">
-            Email: <code className="text-white">admin@tambunselatan.local</code>
-          </p>
-          <p>
-            Sandi: <code className="text-white">GerakanRakyat2026!</code>
-          </p>
-        </div>
 
         <div className="mt-6 flex items-center justify-between text-xs">
           <Link
