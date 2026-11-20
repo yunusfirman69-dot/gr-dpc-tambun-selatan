@@ -11,6 +11,9 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "vars": {
+    "NEXT_PUBLIC_CONVEX_URL": "https://accurate-gull-945.convex.cloud"
+  },
   "observability": {
     "enabled": true
   }
