@@ -93,6 +93,7 @@ export function signSessionToken(
 ): string {
   const payload = Buffer.from(
     JSON.stringify({
+      type: "admin",
       email,
       role,
       name,
@@ -126,8 +127,19 @@ export function verifySessionToken(
   try {
     const decoded = JSON.parse(
       Buffer.from(payload, "base64url").toString("utf-8")
-    ) as { email?: string; role?: AdminRole; name?: string; exp?: number };
-    if (!decoded.email || !decoded.exp || decoded.exp < Date.now()) {
+    ) as {
+      type?: string;
+      email?: string;
+      role?: AdminRole;
+      name?: string;
+      exp?: number;
+    };
+    if (
+      decoded.type === "member" ||
+      !decoded.email ||
+      !decoded.exp ||
+      decoded.exp < Date.now()
+    ) {
       return null;
     }
     return {

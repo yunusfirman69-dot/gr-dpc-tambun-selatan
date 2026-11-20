@@ -27,9 +27,14 @@ export default async function AnggotaPortalPage() {
         <div className="rounded-3xl border border-[#e7deda] bg-white p-7 shadow-sm sm:p-9">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e7deda] pb-5">
             <div>
-              <span className="inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
-                Status: Terdaftar sebagai Anggota
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
+                  Status: Terdaftar sebagai Anggota
+                </span>
+                <span className="inline-block rounded-full bg-[#f7f2ee] px-3 py-1 text-xs font-bold text-[#8d6a5e]">
+                  Akses: Hanya Lihat (Read-Only)
+                </span>
+              </div>
               <h2 className="mt-2 text-2xl font-black text-[#090909]">
                 Kartu Data Keanggotaan
               </h2>
