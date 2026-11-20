@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
-import { getAdminSession } from "@/lib/admin-auth";
+import { getAdminSession, hashPassword } from "@/lib/admin-auth";
 import { addMemberData, getMembersData } from "@/lib/content-store";
 import {
   getConvexClient,
@@ -37,12 +37,20 @@ export async function POST(request: Request) {
     const phone = String(formData.get("phone") || "").trim();
     const email = String(formData.get("email") || "").trim();
     const village = String(formData.get("village") || "").trim();
+    const password = String(formData.get("password") || "");
     const consent = formData.get("consent") === "true";
     const ktpFile = formData.get("ktpFile");
 
-    if (!fullName || !nik || !phone || !email) {
+    if (!fullName || !nik || !phone || !email || !password) {
       return NextResponse.json(
-        { error: "Nama, NIK, No. HP, dan Email wajib diisi." },
+        { error: "Nama, NIK, No. HP, Email, dan Kata Sandi wajib diisi." },
+        { status: 400 }
+      );
+    }
+
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: "Kata sandi akun anggota minimal 8 karakter." },
         { status: 400 }
       );
     }
@@ -90,6 +98,8 @@ export async function POST(request: Request) {
       );
     }
 
+    const passwordHash = await hashPassword(password);
+
     if (getConvexClient()) {
       const { storageId } = await uploadFileToConvexStorage(ktpFile);
       await addMemberData({
@@ -99,13 +109,14 @@ export async function POST(request: Request) {
         email,
         village: village || "Tambun Selatan",
         ktpFileName: storageId,
+        passwordHash,
       });
 
       return NextResponse.json(
         {
           ok: true,
           message:
-            "Pendaftaran anggota berhasil diterima dan disimpan secara privat untuk verifikasi pengurus.",
+            "Pendaftaran anggota berhasil! Silakan masuk melalui halaman Login Anggota menggunakan email dan kata sandi Anda.",
         },
         { status: 201 }
       );
@@ -130,6 +141,7 @@ export async function POST(request: Request) {
         email,
         village: village || "Tambun Selatan",
         ktpFileName,
+        passwordHash,
       });
     } catch {
       return NextResponse.json(
@@ -154,6 +166,13 @@ export async function POST(request: Request) {
     const causeMsg =
       err instanceof Error && err.cause instanceof Error ? err.cause.message : "";
     const fullErr = `${message} ${causeMsg}`;
+
+    if (fullErr.includes("MEMBER_EMAIL_EXISTS")) {
+      return NextResponse.json(
+        { error: "Email ini sudah terdaftar sebagai anggota. Silakan langsung Login Anggota." },
+        { status: 409 }
+      );
+    }
 
     if (
       fullErr.includes("UNABLE_TO_GET_ISSUER_CERT") ||

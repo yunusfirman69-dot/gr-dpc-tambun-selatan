@@ -79,33 +79,26 @@ export async function POST(request: Request) {
       {}
     )) as number;
 
-    const configuredInvite = process.env.ADMIN_INVITE_CODE?.trim();
-    const inviteValid = Boolean(configuredInvite && inviteCode === configuredInvite);
-    const isSuperAdmin = session?.role === "super_admin";
-
-    if (adminCount === 0) {
-      if (configuredInvite && !inviteValid) {
-        return NextResponse.json(
-          { error: "Kode undangan admin tidak sesuai." },
-          { status: 403 }
-        );
-      }
-    } else if (!isSuperAdmin && !inviteValid) {
+    if (adminCount >= 1) {
       return NextResponse.json(
         {
           error:
-            "Pendaftaran admin baru hanya dapat dilakukan oleh Super Admin yang sudah login atau menggunakan Kode Undangan Admin.",
+            "Pendaftaran admin ditutup. Hanya 1 akun admin utama yang diizinkan; silakan daftar atau login sebagai anggota.",
         },
         { status: 403 }
       );
     }
 
-    const assignedRole: AdminRole =
-      adminCount === 0
-        ? "super_admin"
-        : isSuperAdmin && (body.role === "super_admin" || body.role === "editor")
-          ? body.role
-          : "editor";
+    const configuredInvite = process.env.ADMIN_INVITE_CODE?.trim();
+    const inviteValid = Boolean(configuredInvite && inviteCode === configuredInvite);
+    if (configuredInvite && !inviteValid) {
+      return NextResponse.json(
+        { error: "Kode undangan admin tidak sesuai." },
+        { status: 403 }
+      );
+    }
+
+    const assignedRole: AdminRole = "super_admin";
 
     const createdAt = new Intl.DateTimeFormat("id-ID", {
       day: "2-digit",

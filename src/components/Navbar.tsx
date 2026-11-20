@@ -73,12 +73,18 @@ export default function Navbar() {
           })}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden items-center gap-2.5 lg:flex">
+          <Link
+            href="/anggota/login"
+            className="rounded-full border border-[#090909] px-4 py-2 text-xs font-bold text-[#090909] transition-colors hover:bg-[#090909] hover:text-white"
+          >
+            Login Anggota
+          </Link>
           <Link
             href="/admin/login"
-            className="rounded-full bg-[#ff491a] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#e03a0e]"
+            className="rounded-full bg-[#ff491a] px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-[#e03a0e]"
           >
-            Login Admin
+            Admin
           </Link>
         </div>
 
@@ -126,6 +132,13 @@ export default function Navbar() {
                 </Link>
               );
             })}
+            <Link
+              href="/anggota/login"
+              onClick={() => setMobileOpen(false)}
+              className="mt-2 rounded-full border border-[#090909] px-5 py-2.5 text-center text-sm font-bold text-[#090909] transition-colors hover:bg-[#090909] hover:text-white"
+            >
+              Login Anggota
+            </Link>
             <Link
               href="/admin/login"
               onClick={() => setMobileOpen(false)}

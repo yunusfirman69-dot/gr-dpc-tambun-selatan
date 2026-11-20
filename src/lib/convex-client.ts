@@ -75,6 +75,7 @@ export const convexApi = {
   },
   members: {
     listMembers: "members:listMembers",
+    getMemberByEmail: "members:getMemberByEmail",
     addMember: "members:addMember",
     deleteMember: "members:deleteMember",
   },

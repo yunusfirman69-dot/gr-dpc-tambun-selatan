@@ -92,8 +92,9 @@ export default defineSchema({
     email: v.string(),
     village: v.string(),
     ktpStorageId: v.id("_storage"),
+    passwordHash: v.optional(v.string()),
     createdAt: v.string(),
-  }),
+  }).index("by_email", ["email"]),
 
   organizationProfile: defineTable({
     key: v.string(),

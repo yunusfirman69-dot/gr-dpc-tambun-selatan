@@ -54,6 +54,7 @@ export interface StoredMemberItem {
   email: string;
   village: string;
   ktpFileName: string;
+  passwordHash?: string;
   createdAt: string;
 }
 
@@ -382,6 +383,27 @@ export async function getMembersData(): Promise<StoredMemberItem[]> {
   return store.members;
 }
 
+export async function getMemberByEmail(
+  email: string
+): Promise<StoredMemberItem | null> {
+  const normalized = email.toLowerCase().trim();
+  const convex = getConvexClient();
+  if (convex) {
+    try {
+      return (await convex.query(convexApi.members.getMemberByEmail, {
+        email: normalized,
+      })) as StoredMemberItem | null;
+    } catch {
+      return null;
+    }
+  }
+  const store = await readStore();
+  return (
+    store.members.find((m) => m.email.toLowerCase().trim() === normalized) ||
+    null
+  );
+}
+
 export async function addMemberData(
   member: Omit<StoredMemberItem, "id" | "createdAt">
 ): Promise<StoredMemberItem> {
@@ -399,9 +421,10 @@ export async function addMemberData(
       fullName: member.fullName,
       nik: member.nik,
       phone: member.phone,
-      email: member.email,
+      email: member.email.toLowerCase().trim(),
       village: member.village,
       ktpStorageId: member.ktpFileName,
+      passwordHash: member.passwordHash,
       createdAt,
     })) as string;
     return { ...member, id, createdAt };
@@ -410,6 +433,7 @@ export async function addMemberData(
   const store = await readStore();
   const created: StoredMemberItem = {
     ...member,
+    email: member.email.toLowerCase().trim(),
     id: `mbr-${Date.now()}`,
     createdAt,
   };

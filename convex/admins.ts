@@ -51,6 +51,11 @@ export const createAdmin = mutation({
     createdAt: v.string(),
   },
   handler: async (ctx, args) => {
+    const allAdmins = await ctx.db.query("admins").collect();
+    if (allAdmins.length >= 1) {
+      throw new Error("ADMIN_LIMIT_REACHED");
+    }
+
     const normalizedEmail = args.email.toLowerCase().trim();
     const existing = await ctx.db
       .query("admins")

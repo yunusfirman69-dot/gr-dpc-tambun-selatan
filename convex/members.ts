@@ -9,11 +9,48 @@ export const addMember = mutation({
     email: v.string(),
     village: v.string(),
     ktpStorageId: v.id("_storage"),
+    passwordHash: v.optional(v.string()),
     createdAt: v.string(),
   },
   handler: async (ctx, args) => {
-    const id = await ctx.db.insert("members", args);
+    const normalizedEmail = args.email.toLowerCase().trim();
+    const existing = await ctx.db
+      .query("members")
+      .withIndex("by_email", (q) => q.eq("email", normalizedEmail))
+      .first();
+
+    if (existing) {
+      throw new Error("MEMBER_EMAIL_EXISTS");
+    }
+
+    const id = await ctx.db.insert("members", {
+      ...args,
+      email: normalizedEmail,
+    });
     return id;
+  },
+});
+
+export const getMemberByEmail = query({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    const row = await ctx.db
+      .query("members")
+      .withIndex("by_email", (q) =>
+        q.eq("email", args.email.toLowerCase().trim())
+      )
+      .first();
+    if (!row) return null;
+    return {
+      id: row._id,
+      fullName: row.fullName,
+      nik: row.nik,
+      phone: row.phone,
+      email: row.email,
+      village: row.village,
+      passwordHash: row.passwordHash,
+      createdAt: row.createdAt,
+    };
   },
 });
 

@@ -114,7 +114,7 @@ export default function AdminAccountsManager({
       )}
 
       <div className="grid gap-8 lg:grid-cols-12">
-        {isSuperAdmin && (
+        {isSuperAdmin && admins.length === 0 && (
           <div className="lg:col-span-5">
             <form
               onSubmit={handleCreate}
@@ -194,7 +194,7 @@ export default function AdminAccountsManager({
           </div>
         )}
 
-        <div className={isSuperAdmin ? "lg:col-span-7" : "lg:col-span-12"}>
+        <div className={isSuperAdmin && admins.length === 0 ? "lg:col-span-7" : "lg:col-span-12"}>
           <div className="space-y-4">
             <h2 className="text-lg font-extrabold text-[#090909]">
               Daftar Admin Terdaftar ({admins.length})

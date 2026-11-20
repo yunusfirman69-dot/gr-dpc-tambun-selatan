@@ -69,8 +69,7 @@ export default function AdminRegisterPage() {
     }
   }
 
-  const needsInviteOrLogin =
-    status && status.hasAdmins && !status.isSuperAdmin;
+  const adminClosed = Boolean(status && status.hasAdmins);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#090909] px-4 py-12 text-white">
@@ -95,20 +94,33 @@ export default function AdminRegisterPage() {
 
         <h1 className="mt-6 text-2xl font-black">Registrasi Akun Admin</h1>
         <p className="mt-1.5 text-sm text-neutral-400">
-          {status && !status.hasAdmins
-            ? "Belum ada admin terdaftar di database Convex. Buat akun Super Admin pertama Anda."
-            : "Daftarkan akun admin baru yang tersimpan di database Convex."}
+          {adminClosed
+            ? "Akun Admin Utama sudah terdaftar. Hanya 1 akun admin yang diizinkan."
+            : "Belum ada admin terdaftar di database Convex. Buat 1 akun Admin Utama Anda."}
         </p>
 
-        {needsInviteOrLogin && !status?.hasInviteCodeConfigured && (
-          <div className="mt-4 rounded-xl border border-[#ff491a]/40 bg-[#ff491a]/10 px-4 py-3 text-xs leading-relaxed text-[#ffc3b3]">
-            Sudah ada admin terdaftar. Untuk menambah admin baru, silakan{" "}
-            <Link href="/admin/login" className="font-bold text-white underline">
-              login sebagai Super Admin
-            </Link>{" "}
-            terlebih dahulu, lalu kelola akun di menu <strong>Pengaturan Admin</strong>.
+        {adminClosed ? (
+          <div className="mt-6 space-y-4">
+            <div className="rounded-xl border border-[#ff491a]/40 bg-[#ff491a]/10 px-4 py-3 text-xs leading-relaxed text-[#ffc3b3]">
+              Pendaftaran akun admin sudah ditutup karena hanya 1 akun admin
+              utama yang diizinkan. Untuk pengguna lain, silakan daftar atau
+              masuk sebagai <strong>Anggota</strong>.
+            </div>
+            <Link
+              href="/anggota/login"
+              className="block w-full rounded-full bg-[#ff491a] px-6 py-3.5 text-center text-sm font-bold text-white transition-colors hover:bg-[#e03a0e]"
+            >
+              Masuk sebagai Anggota
+            </Link>
+            <Link
+              href="/#daftar-anggota"
+              className="block w-full rounded-full border border-neutral-700 px-6 py-3 text-center text-xs font-bold text-neutral-200 hover:border-[#ff491a]"
+            >
+              Daftar Menjadi Anggota
+            </Link>
           </div>
-        )}
+        ) : (
+          <>
 
         {error && (
           <div className="mt-4 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-xs font-semibold text-red-300">
@@ -219,6 +231,8 @@ export default function AdminRegisterPage() {
             {loading ? "Mendaftarkan..." : "Daftar Akun Admin"}
           </button>
         </form>
+        </>
+        )}
 
         <div className="mt-6 flex items-center justify-between text-xs text-neutral-400">
           <Link href="/admin/login" className="font-semibold text-[#ffc3b3] hover:text-[#ff491a]">

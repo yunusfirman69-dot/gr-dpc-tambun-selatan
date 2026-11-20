@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { cookies } from "next/headers";
 
 export const ADMIN_COOKIE_NAME = "pgr_admin_session";
+export const MEMBER_COOKIE_NAME = "pgr_member_session";
 
 export type AdminRole = "super_admin" | "editor";
 
@@ -9,6 +10,12 @@ export interface AdminSession {
   email: string;
   role: AdminRole;
   name?: string;
+}
+
+export interface MemberSession {
+  id: string;
+  email: string;
+  fullName: string;
 }
 
 function getSecret(): string {
@@ -137,4 +144,74 @@ export async function getAdminSession(): Promise<AdminSession | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
   return verifySessionToken(token);
+}
+
+export function signMemberSessionToken(member: MemberSession): string {
+  const payload = Buffer.from(
+    JSON.stringify({
+      type: "member",
+      id: member.id,
+      email: member.email,
+      fullName: member.fullName,
+      exp: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    })
+  ).toString("base64url");
+  const sig = crypto
+    .createHmac("sha256", getSecret())
+    .update(payload)
+    .digest("base64url");
+  return `${payload}.${sig}`;
+}
+
+export function verifyMemberSessionToken(
+  token: string | undefined
+): MemberSession | null {
+  if (!token || !token.includes(".")) return null;
+  const [payload, sig] = token.split(".");
+  if (!payload || !sig) return null;
+
+  const expectedSig = crypto
+    .createHmac("sha256", getSecret())
+    .update(payload)
+    .digest("base64url");
+
+  if (sig.length !== expectedSig.length) return null;
+  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expectedSig))) {
+    return null;
+  }
+
+  try {
+    const decoded = JSON.parse(
+      Buffer.from(payload, "base64url").toString("utf-8")
+    ) as {
+      type?: string;
+      id?: string;
+      email?: string;
+      fullName?: string;
+      exp?: number;
+    };
+    if (
+      decoded.type !== "member" ||
+      !decoded.id ||
+      !decoded.email ||
+      !decoded.fullName ||
+      !decoded.exp ||
+      decoded.exp < Date.now()
+    ) {
+      return null;
+    }
+    return {
+      id: decoded.id,
+      email: decoded.email,
+      fullName: decoded.fullName,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function getMemberSession(): Promise<MemberSession | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(MEMBER_COOKIE_NAME)?.value;
+  return verifyMemberSessionToken(token);
 }

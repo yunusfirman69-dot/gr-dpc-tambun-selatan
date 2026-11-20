@@ -8,6 +8,7 @@ export default function MemberRegistrationForm() {
   const [nik, setNik] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [village, setVillage] = useState(organizationInfo.areas[0]);
   const [ktpFile, setKtpFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState("");
@@ -39,6 +40,7 @@ export default function MemberRegistrationForm() {
       fd.append("nik", nik);
       fd.append("phone", phone);
       fd.append("email", email);
+      fd.append("password", password);
       fd.append("village", village);
       fd.append("consent", String(consent));
       fd.append("ktpFile", ktpFile);
@@ -68,6 +70,7 @@ export default function MemberRegistrationForm() {
       setNik("");
       setPhone("");
       setEmail("");
+      setPassword("");
       setConsent(false);
       handleFileChange(null);
     } catch {
@@ -172,21 +175,38 @@ export default function MemberRegistrationForm() {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-bold text-[#090909]">
-            Desa / Kelurahan Domisili
-          </label>
-          <select
-            value={village}
-            onChange={(e) => setVillage(e.target.value)}
-            className="mt-1.5 w-full rounded-xl border border-[#e7deda] bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-[#ff491a]"
-          >
-            {organizationInfo.areas.map((area) => (
-              <option key={area} value={area}>
-                {area}
-              </option>
-            ))}
-          </select>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-bold text-[#090909]">
+              Desa / Kelurahan Domisili
+            </label>
+            <select
+              value={village}
+              onChange={(e) => setVillage(e.target.value)}
+              className="mt-1.5 w-full rounded-xl border border-[#e7deda] bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-[#ff491a]"
+            >
+              {organizationInfo.areas.map((area) => (
+                <option key={area} value={area}>
+                  {area}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-[#090909]">
+              Kata Sandi Akun Anggota (Min. 8) *
+            </label>
+            <input
+              type="password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Untuk login sebagai anggota"
+              className="mt-1.5 w-full rounded-xl border border-[#e7deda] px-4 py-3 text-sm outline-none transition-colors focus:border-[#ff491a]"
+            />
+          </div>
         </div>
 
         <div className="rounded-2xl border border-[#e7deda] bg-[#f7f2ee]/60 p-4">
