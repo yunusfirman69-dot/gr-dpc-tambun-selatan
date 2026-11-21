@@ -485,6 +485,26 @@ export async function updateMemberData(
   return updated;
 }
 
+export async function resetMemberPassword(
+  id: string,
+  passwordHash: string
+): Promise<boolean> {
+  const convex = getConvexClient();
+  if (convex) {
+    return (await convex.mutation(convexApi.members.resetMemberPassword, {
+      id,
+      passwordHash,
+    })) as boolean;
+  }
+
+  const store = await readStore();
+  const idx = store.members.findIndex((item) => item.id === id);
+  if (idx === -1) return false;
+  store.members[idx] = { ...store.members[idx], passwordHash };
+  await writeStore(store);
+  return true;
+}
+
 export async function deleteMemberData(id: string): Promise<boolean> {
   const convex = getConvexClient();
   if (convex) {

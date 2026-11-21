@@ -124,6 +124,19 @@ export const updateMember = mutation({
   },
 });
 
+export const resetMemberPassword = mutation({
+  args: {
+    id: v.id("members"),
+    passwordHash: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db.get(args.id);
+    if (!existing) return false;
+    await ctx.db.patch(args.id, { passwordHash: args.passwordHash });
+    return true;
+  },
+});
+
 export const deleteMember = mutation({
   args: { id: v.id("members") },
   handler: async (ctx, args) => {

@@ -90,9 +90,17 @@ export default function AnggotaLoginPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#090909]">
-              Kata Sandi
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#090909]">
+                Kata Sandi
+              </label>
+              <Link
+                href="/anggota/lupa-sandi"
+                className="text-xs font-bold text-[#ff491a] hover:underline"
+              >
+                Lupa Kata Sandi?
+              </Link>
+            </div>
             <input
               type="password"
               required
