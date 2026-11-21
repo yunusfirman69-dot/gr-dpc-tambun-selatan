@@ -442,6 +442,49 @@ export async function addMemberData(
   return created;
 }
 
+export async function updateMemberData(
+  id: string,
+  updates: {
+    fullName: string;
+    nik: string;
+    phone: string;
+    email: string;
+    village: string;
+    ktpFileName?: string;
+  }
+): Promise<StoredMemberItem | null> {
+  const convex = getConvexClient();
+  if (convex) {
+    return (await convex.mutation(convexApi.members.updateMember, {
+      id,
+      fullName: updates.fullName,
+      nik: updates.nik,
+      phone: updates.phone,
+      email: updates.email.toLowerCase().trim(),
+      village: updates.village,
+      ktpStorageId: updates.ktpFileName,
+    })) as StoredMemberItem | null;
+  }
+
+  const store = await readStore();
+  const idx = store.members.findIndex((item) => item.id === id);
+  if (idx === -1) return null;
+
+  const current = store.members[idx];
+  const updated: StoredMemberItem = {
+    ...current,
+    fullName: updates.fullName,
+    nik: updates.nik,
+    phone: updates.phone,
+    email: updates.email.toLowerCase().trim(),
+    village: updates.village,
+    ktpFileName: updates.ktpFileName || current.ktpFileName,
+  };
+  store.members[idx] = updated;
+  await writeStore(store);
+  return updated;
+}
+
 export async function deleteMemberData(id: string): Promise<boolean> {
   const convex = getConvexClient();
   if (convex) {
