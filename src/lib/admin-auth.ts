@@ -98,7 +98,7 @@ export function signSessionToken(
       email,
       role,
       name,
-      exp: Date.now() + 1000 * 60 * 60 * 24,
+      exp: Date.now() + 1000 * 60 * 60 * 24 * 7,
     })
   ).toString("base64url");
   const sig = crypto

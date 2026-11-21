@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const navItems = [
   { href: "/", label: "Beranda" },
@@ -18,6 +18,17 @@ const navItems = [
 export default function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (pathname.startsWith("/admin")) return;
+    fetch("/api/admin/session")
+      .then((r) => r.json())
+      .then((data: { authenticated?: boolean }) => {
+        setIsAdminLoggedIn(Boolean(data.authenticated));
+      })
+      .catch(() => {});
+  }, [pathname]);
 
   if (pathname.startsWith("/admin")) {
     return null;
@@ -81,10 +92,10 @@ export default function Navbar() {
             Login Anggota
           </Link>
           <Link
-            href="/admin/login"
+            href={isAdminLoggedIn ? "/admin" : "/admin/login"}
             className="rounded-full bg-[#ff491a] px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-[#e03a0e]"
           >
-            Admin
+            {isAdminLoggedIn ? "Dashboard Admin" : "Admin"}
           </Link>
         </div>
 
@@ -140,11 +151,11 @@ export default function Navbar() {
               Login Anggota
             </Link>
             <Link
-              href="/admin/login"
+              href={isAdminLoggedIn ? "/admin" : "/admin/login"}
               onClick={() => setMobileOpen(false)}
               className="mt-2 rounded-full bg-[#ff491a] px-5 py-2.5 text-center text-sm font-bold text-white transition-colors hover:bg-[#e03a0e]"
             >
-              Login Admin
+              {isAdminLoggedIn ? "Dashboard Admin" : "Login Admin"}
             </Link>
           </nav>
         </div>
