@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import ContactForm from "@/components/ContactForm";
 import {
   organizationInfo,
   pillars,
@@ -317,31 +318,35 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 6. CLOSING CTA BANNER */}
+      {/* 6. CLOSING CTA BANNER + KIRIM PESAN ASPIRASI */}
       <section className="bg-gradient-to-r from-[#ff491a] via-[#d9390f] to-[#090909] py-16 text-white">
-        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 px-4 sm:px-6 lg:flex-row lg:items-center lg:px-8">
-          <div className="max-w-2xl">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:px-8">
+          <div className="space-y-6 lg:col-span-5">
             <h2 className="text-2xl font-black tracking-tight sm:text-4xl">
               Bersinergi Bangun Tambun Selatan
             </h2>
-            <p className="mt-2 text-sm text-white/90 sm:text-base">
+            <p className="text-sm text-white/90 sm:text-base">
               Sampaikan aspirasi, saran, atau hubungi Sekretariat DPC Partai
               Gerakan Rakyat Kecamatan Tambun Selatan.
             </p>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/kontak"
+                className="rounded-full bg-[#090909] px-7 py-3.5 text-sm font-bold text-white transition-colors hover:bg-neutral-800"
+              >
+                Hubungi Sekretariat
+              </Link>
+              <Link
+                href="/pengurus"
+                className="rounded-full bg-white px-7 py-3.5 text-sm font-bold text-[#ff491a] transition-colors hover:bg-[#f7f2ee]"
+              >
+                Struktur Pengurus
+              </Link>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/kontak"
-              className="rounded-full bg-[#090909] px-7 py-3.5 text-sm font-bold text-white transition-colors hover:bg-neutral-800"
-            >
-              Hubungi Sekretariat
-            </Link>
-            <Link
-              href="/pengurus"
-              className="rounded-full bg-white px-7 py-3.5 text-sm font-bold text-[#ff491a] transition-colors hover:bg-[#f7f2ee]"
-            >
-              Struktur Pengurus
-            </Link>
+
+          <div className="lg:col-span-7">
+            <ContactForm />
           </div>
         </div>
       </section>

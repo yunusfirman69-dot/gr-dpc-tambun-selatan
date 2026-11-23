@@ -12,7 +12,7 @@ export default function ContactForm() {
   }
 
   return (
-    <div className="rounded-3xl border border-[#e7deda] bg-white p-7 shadow-sm sm:p-9">
+    <div className="rounded-3xl border border-[#e7deda] bg-white p-7 text-[#090909] shadow-sm sm:p-9">
       <h2 className="text-2xl font-extrabold text-[#090909]">
         Kirim Pesan atau Aspirasi
       </h2>
