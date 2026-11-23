@@ -20,7 +20,9 @@ export const metadata: Metadata = {
   description:
     "Website resmi Partai Gerakan Rakyat DPC Tambun Selatan, Kabupaten Bekasi, Jawa Barat.",
   icons: {
-    icon: "/images/logo.png",
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/apple-icon.png",
   },
 };
 
