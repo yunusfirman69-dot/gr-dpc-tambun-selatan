@@ -18,6 +18,7 @@ export default function AdminMembersManager({
   const [editKtpFile, setEditKtpFile] = useState<File | null>(null);
   const [editPreviewUrl, setEditPreviewUrl] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
+  const [exportingExcel, setExportingExcel] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{
     type: "ok" | "err";
     text: string;
@@ -116,73 +117,140 @@ export default function AdminMembersManager({
     }
   }
 
-  function escapeXml(value: string): string {
-    return value
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&apos;");
+  function getMemberKtpPath(m: StoredMemberItem): string {
+    return m.ktpFileName
+      ? `/api/members/ktp/${encodeURIComponent(m.ktpFileName)}`
+      : "";
   }
 
-  function handleExportExcel() {
-    const rowsXml = filtered
-      .map(
-        (m, idx) => `
-      <Row>
-        <Cell><Data ss:Type="Number">${idx + 1}</Data></Cell>
-        <Cell><Data ss:Type="String">${escapeXml(m.fullName)}</Data></Cell>
-        <Cell><Data ss:Type="String">${escapeXml(m.nik)}</Data></Cell>
-        <Cell><Data ss:Type="String">${escapeXml(m.phone)}</Data></Cell>
-        <Cell><Data ss:Type="String">${escapeXml(m.email)}</Data></Cell>
-        <Cell><Data ss:Type="String">${escapeXml(m.village)}</Data></Cell>
-        <Cell><Data ss:Type="String">${escapeXml(m.createdAt)}</Data></Cell>
-      </Row>`
-      )
-      .join("");
+  async function fetchKtpImageForExcel(
+    url: string
+  ): Promise<{ base64: string; extension: "jpeg" } | null> {
+    if (!url) return null;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      try {
+        const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+          const el = new Image();
+          el.onload = () => resolve(el);
+          el.onerror = () => reject(new Error("Image load failed"));
+          el.src = objectUrl;
+        });
+        const maxWidth = 600;
+        const scale = img.width > maxWidth ? maxWidth / img.width : 1;
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return null;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+        const base64 = dataUrl.split(",")[1];
+        return base64 ? { base64, extension: "jpeg" } : null;
+      } finally {
+        URL.revokeObjectURL(objectUrl);
+      }
+    } catch {
+      return null;
+    }
+  }
 
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
- xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
- <Styles>
-  <Style ss:ID="Header">
-   <Font ss:Bold="1" ss:Color="#FFFFFF"/>
-   <Interior ss:Color="#FF491A" ss:Pattern="Solid"/>
-  </Style>
- </Styles>
- <Worksheet ss:Name="Data Anggota DPC">
-  <Table>
-   <Column ss:Width="40"/>
-   <Column ss:Width="180"/>
-   <Column ss:Width="140"/>
-   <Column ss:Width="120"/>
-   <Column ss:Width="180"/>
-   <Column ss:Width="140"/>
-   <Column ss:Width="140"/>
-   <Row>
-    <Cell ss:StyleID="Header"><Data ss:Type="String">No</Data></Cell>
-    <Cell ss:StyleID="Header"><Data ss:Type="String">Nama Lengkap</Data></Cell>
-    <Cell ss:StyleID="Header"><Data ss:Type="String">NIK</Data></Cell>
-    <Cell ss:StyleID="Header"><Data ss:Type="String">No. HP / WhatsApp</Data></Cell>
-    <Cell ss:StyleID="Header"><Data ss:Type="String">Email</Data></Cell>
-    <Cell ss:StyleID="Header"><Data ss:Type="String">Desa / Kelurahan</Data></Cell>
-    <Cell ss:StyleID="Header"><Data ss:Type="String">Waktu Daftar</Data></Cell>
-   </Row>
-   ${rowsXml}
-  </Table>
- </Worksheet>
-</Workbook>`;
+  async function handleExportExcel() {
+    if (exportingExcel) return;
+    setExportingExcel(true);
+    setStatusMsg(null);
 
-    const blob = new Blob(["\uFEFF" + xml], {
-      type: "application/vnd.ms-excel;charset=utf-8;",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "data-anggota-dpc-tambun-selatan.xls";
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const ExcelJS = (await import("exceljs")).default;
+      const workbook = new ExcelJS.Workbook();
+      const sheet = workbook.addWorksheet("Data Anggota DPC");
+
+      sheet.columns = [
+        { header: "No", key: "no", width: 6 },
+        { header: "Nama Lengkap", key: "fullName", width: 28 },
+        { header: "NIK", key: "nik", width: 20 },
+        { header: "No. HP / WhatsApp", key: "phone", width: 18 },
+        { header: "Email", key: "email", width: 28 },
+        { header: "Desa / Kelurahan", key: "village", width: 22 },
+        { header: "Waktu Daftar", key: "createdAt", width: 22 },
+        { header: "Foto KTP", key: "ktpPhoto", width: 26 },
+        { header: "Link Foto KTP", key: "ktpUrl", width: 38 },
+      ];
+
+      const headerRow = sheet.getRow(1);
+      headerRow.height = 26;
+      headerRow.eachCell((cell) => {
+        cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFFF491A" },
+        };
+        cell.alignment = { vertical: "middle", horizontal: "center" };
+      });
+
+      const images = await Promise.all(
+        filtered.map((m) => fetchKtpImageForExcel(getMemberKtpPath(m)))
+      );
+
+      filtered.forEach((m, idx) => {
+        const ktpPath = getMemberKtpPath(m);
+        const fullKtpUrl = ktpPath ? `${window.location.origin}${ktpPath}` : "-";
+
+        const row = sheet.addRow({
+          no: idx + 1,
+          fullName: m.fullName,
+          nik: m.nik,
+          phone: m.phone,
+          email: m.email,
+          village: m.village,
+          createdAt: m.createdAt,
+          ktpPhoto: images[idx] ? "" : "Foto tidak tersedia",
+          ktpUrl: fullKtpUrl,
+        });
+
+        row.height = 85;
+        row.eachCell((cell) => {
+          cell.alignment = { vertical: "middle", wrapText: true };
+        });
+
+        const imgData = images[idx];
+        if (imgData) {
+          const imageId = workbook.addImage({
+            base64: imgData.base64,
+            extension: imgData.extension,
+          });
+          sheet.addImage(imageId, {
+            tl: { col: 7, row: idx + 1 },
+            ext: { width: 160, height: 100 },
+            editAs: "oneCell",
+          });
+        }
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "data-anggota-dpc-tambun-selatan.xlsx";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setStatusMsg({
+        type: "err",
+        text: "Gagal membuat file Excel. Silakan coba lagi.",
+      });
+    } finally {
+      setExportingExcel(false);
+    }
   }
 
   function handleExportCsv() {
@@ -193,15 +261,21 @@ export default function AdminMembersManager({
       "Email",
       "Desa/Kelurahan",
       "Waktu Daftar",
+      "Link Foto KTP",
     ];
-    const rows = filtered.map((m) => [
-      `"${m.fullName.replace(/"/g, '""')}"`,
-      `"'${m.nik}"`,
-      `"'${m.phone}"`,
-      `"${m.email}"`,
-      `"${m.village}"`,
-      `"${m.createdAt}"`,
-    ]);
+    const rows = filtered.map((m) => {
+      const ktpPath = getMemberKtpPath(m);
+      const fullKtpUrl = ktpPath ? `${window.location.origin}${ktpPath}` : "-";
+      return [
+        `"${m.fullName.replace(/"/g, '""')}"`,
+        `"'${m.nik}"`,
+        `"'${m.phone}"`,
+        `"${m.email}"`,
+        `"${m.village}"`,
+        `"${m.createdAt}"`,
+        `"${fullKtpUrl}"`,
+      ];
+    });
     const csv =
       "\uFEFF" + [header.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -234,9 +308,12 @@ export default function AdminMembersManager({
             <button
               type="button"
               onClick={handleExportExcel}
-              className="rounded-full bg-[#ff491a] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#e03a0e]"
+              disabled={exportingExcel}
+              className="rounded-full bg-[#ff491a] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#e03a0e] disabled:opacity-60"
             >
-              Download Excel (.xls) ({filtered.length})
+              {exportingExcel
+                ? "Menyiapkan Excel + Foto KTP..."
+                : `Download Excel (.xlsx) (${filtered.length})`}
             </button>
             <button
               type="button"
