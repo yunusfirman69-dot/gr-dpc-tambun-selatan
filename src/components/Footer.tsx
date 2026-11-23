@@ -155,9 +155,9 @@ export default function Footer() {
                   <p>Jam Layanan: {contact.hours}</p>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {contact.socials.map((soc) => (
+                  {contact.socials.map((soc, idx) => (
                     <a
-                      key={`${soc.name}-${soc.href}`}
+                      key={`${soc.name}-${idx}`}
                       href={soc.href}
                       target={soc.href.startsWith("http") ? "_blank" : undefined}
                       rel={
@@ -165,9 +165,13 @@ export default function Footer() {
                           ? "noopener noreferrer"
                           : undefined
                       }
-                      className="rounded-full border border-neutral-800 bg-neutral-900 px-3 py-1 text-xs font-medium text-neutral-300 transition-colors hover:border-[#ff491a] hover:text-[#ff491a]"
+                      title={soc.handle ? `${soc.name}: ${soc.handle}` : soc.name}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-neutral-800 bg-neutral-900 px-3 py-1 text-xs font-medium text-neutral-300 transition-colors hover:border-[#ff491a] hover:text-[#ff491a]"
                     >
-                      {soc.name}
+                      <span className="font-semibold text-white">{soc.name}</span>
+                      {soc.handle ? (
+                        <span className="text-neutral-400">({soc.handle})</span>
+                      ) : null}
                     </a>
                   ))}
                 </div>
