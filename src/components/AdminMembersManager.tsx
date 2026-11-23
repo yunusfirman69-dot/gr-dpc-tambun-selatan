@@ -178,8 +178,7 @@ export default function AdminMembersManager({
         { header: "Email", key: "email", width: 28 },
         { header: "Desa / Kelurahan", key: "village", width: 22 },
         { header: "Waktu Daftar", key: "createdAt", width: 22 },
-        { header: "Foto KTP", key: "ktpPhoto", width: 26 },
-        { header: "Link Foto KTP", key: "ktpUrl", width: 38 },
+        { header: "Foto KTP", key: "ktpPhoto", width: 28 },
       ];
 
       const headerRow = sheet.getRow(1);
@@ -199,9 +198,6 @@ export default function AdminMembersManager({
       );
 
       filtered.forEach((m, idx) => {
-        const ktpPath = getMemberKtpPath(m);
-        const fullKtpUrl = ktpPath ? `${window.location.origin}${ktpPath}` : "-";
-
         const row = sheet.addRow({
           no: idx + 1,
           fullName: m.fullName,
@@ -211,7 +207,6 @@ export default function AdminMembersManager({
           village: m.village,
           createdAt: m.createdAt,
           ktpPhoto: images[idx] ? "" : "Foto tidak tersedia",
-          ktpUrl: fullKtpUrl,
         });
 
         row.height = 85;
