@@ -16,10 +16,6 @@ export default function ContactForm() {
       <h2 className="text-2xl font-extrabold text-[#090909]">
         Kirim Pesan atau Aspirasi
       </h2>
-      <p className="mt-2 text-sm text-[#8d6a5e]">
-        Formulir ini merupakan tampilan awal (belum tersambung ke database
-        email/server).
-      </p>
 
       {submitted ? (
         <div className="mt-6 rounded-2xl border border-[#ff491a]/30 bg-[#f7f2ee] p-6 text-sm text-[#090909]">
