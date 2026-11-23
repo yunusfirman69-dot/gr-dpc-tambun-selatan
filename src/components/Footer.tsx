@@ -3,10 +3,41 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { organizationInfo } from "@/data/placeholder";
+
+interface FooterContact {
+  address: string;
+  phone?: string;
+  whatsapp?: string;
+  email: string;
+  hours: string;
+  socials: { name: string; handle?: string; href: string }[];
+}
 
 export default function Footer() {
   const pathname = usePathname();
+  const [contact, setContact] = useState<FooterContact | null>(null);
+
+  useEffect(() => {
+    if (pathname.startsWith("/admin")) return;
+    let active = true;
+    fetch("/api/contact", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data: { contact?: FooterContact }) => {
+        if (active && data.contact) {
+          setContact(data.contact);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setContact(organizationInfo.contact);
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, [pathname]);
 
   if (pathname.startsWith("/admin")) {
     return null;
@@ -111,22 +142,41 @@ export default function Footer() {
             <h3 className="text-xs font-bold uppercase tracking-widest text-[#ffc3b3]">
               Sekretariat DPC
             </h3>
-            <div className="mt-4 space-y-2.5 text-sm text-neutral-400">
-              <p>{organizationInfo.contact.address}</p>
-              <p>Email: {organizationInfo.contact.email}</p>
-              <p>Jam Layanan: {organizationInfo.contact.hours}</p>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {organizationInfo.contact.socials.map((soc) => (
-                <a
-                  key={soc.name}
-                  href={soc.href}
-                  className="rounded-full border border-neutral-800 bg-neutral-900 px-3 py-1 text-xs font-medium text-neutral-300 transition-colors hover:border-[#ff491a] hover:text-[#ff491a]"
-                >
-                  {soc.name}
-                </a>
-              ))}
-            </div>
+            {contact ? (
+              <>
+                <div className="mt-4 space-y-2.5 text-sm text-neutral-400">
+                  <p>{contact.address}</p>
+                  {contact.whatsapp || contact.phone ? (
+                    <p>
+                      Telp/WA: {[contact.phone, contact.whatsapp].filter(Boolean).join(" • ")}
+                    </p>
+                  ) : null}
+                  <p>Email: {contact.email}</p>
+                  <p>Jam Layanan: {contact.hours}</p>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {contact.socials.map((soc) => (
+                    <a
+                      key={`${soc.name}-${soc.href}`}
+                      href={soc.href}
+                      target={soc.href.startsWith("http") ? "_blank" : undefined}
+                      rel={
+                        soc.href.startsWith("http")
+                          ? "noopener noreferrer"
+                          : undefined
+                      }
+                      className="rounded-full border border-neutral-800 bg-neutral-900 px-3 py-1 text-xs font-medium text-neutral-300 transition-colors hover:border-[#ff491a] hover:text-[#ff491a]"
+                    >
+                      {soc.name}
+                    </a>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="mt-4 text-sm text-neutral-500">
+                Memuat informasi sekretariat...
+              </p>
+            )}
           </div>
         </div>
 
