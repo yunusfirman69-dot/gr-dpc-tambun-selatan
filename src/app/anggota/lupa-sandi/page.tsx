@@ -202,7 +202,7 @@ export default function LupaSandiAnggotaPage() {
             ← Kembali ke Login Anggota
           </Link>
           <Link
-            href="/#daftar-anggota"
+            href="/daftar-anggota"
             className="font-semibold text-[#8d6a5e] hover:text-[#090909]"
           >
             Daftar Anggota

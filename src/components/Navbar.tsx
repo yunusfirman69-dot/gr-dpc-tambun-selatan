@@ -12,6 +12,7 @@ const navItems = [
   { href: "/program-kerja", label: "Program Kerja" },
   { href: "/berita", label: "Berita" },
   { href: "/galeri", label: "Galeri" },
+  { href: "/daftar-anggota", label: "Daftar Anggota" },
   { href: "/kontak", label: "Kontak" },
 ];
 

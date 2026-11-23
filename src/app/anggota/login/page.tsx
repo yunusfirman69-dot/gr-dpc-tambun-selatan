@@ -122,7 +122,7 @@ export default function AnggotaLoginPage() {
 
         <div className="mt-6 flex items-center justify-between border-t border-[#e7deda] pt-4 text-xs">
           <Link
-            href="/#daftar-anggota"
+            href="/daftar-anggota"
             className="font-bold text-[#ff491a] hover:underline"
           >
             Belum punya akun? Daftar Anggota

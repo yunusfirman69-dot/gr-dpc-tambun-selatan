@@ -89,6 +89,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/daftar-anggota" className="transition-colors hover:text-[#ff491a]">
+                  Daftar Anggota
+                </Link>
+              </li>
+              <li>
                 <Link href="/kontak" className="transition-colors hover:text-[#ff491a]">
                   Kontak Sekretariat
                 </Link>
