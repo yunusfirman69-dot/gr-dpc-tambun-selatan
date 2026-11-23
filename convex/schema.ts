@@ -140,4 +140,12 @@ export default defineSchema({
     ),
     createdAt: v.string(),
   }).index("by_email", ["email"]),
+
+  aspirations: defineTable({
+    fullName: v.string(),
+    contact: v.string(),
+    village: v.string(),
+    message: v.string(),
+    createdAt: v.string(),
+  }),
 });

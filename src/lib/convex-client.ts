@@ -89,6 +89,11 @@ export const convexApi = {
     updateAdminStatus: "admins:updateAdminStatus",
     deleteAdmin: "admins:deleteAdmin",
   },
+  aspirations: {
+    listAspirations: "aspirations:listAspirations",
+    addAspiration: "aspirations:addAspiration",
+    deleteAspiration: "aspirations:deleteAspiration",
+  },
 } as const;
 
 export async function uploadFileToConvexStorage(

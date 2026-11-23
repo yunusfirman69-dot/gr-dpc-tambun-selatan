@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import AdminShell from "@/components/AdminShell";
 import { getAdminSession } from "@/lib/admin-auth";
 import {
+  getAspirationsData,
   getGalleryItems,
   getMembersData,
   getNewsPosts,
@@ -17,13 +18,15 @@ async function AdminDashboardContent() {
     redirect("/admin/login");
   }
 
-  const [news, gallery, programKerja, officials, members] = await Promise.all([
-    getNewsPosts(),
-    getGalleryItems(),
-    getProgramKerjaData(),
-    getOfficialsData(),
-    getMembersData(),
-  ]);
+  const [news, gallery, programKerja, officials, members, aspirations] =
+    await Promise.all([
+      getNewsPosts(),
+      getGalleryItems(),
+      getProgramKerjaData(),
+      getOfficialsData(),
+      getMembersData(),
+      getAspirationsData(),
+    ]);
 
   const totalSubPrograms = programKerja.fields.reduce(
     (sum, f) => sum + f.items.length,
@@ -131,6 +134,21 @@ async function AdminDashboardContent() {
               className="mt-5 inline-block rounded-full bg-[#ff491a] px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#e03a0e]"
             >
               Lihat Data Anggota
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border border-[#e7deda] bg-white p-7 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#ff491a]">
+              Aspirasi &amp; Pesan Warga
+            </p>
+            <p className="mt-2 text-4xl font-black text-[#090909]">
+              {aspirations.length}
+            </p>
+            <Link
+              href="/admin/aspirasi"
+              className="mt-5 inline-block rounded-full bg-[#090909] px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-neutral-800"
+            >
+              Lihat Aspirasi &amp; Excel
             </Link>
           </div>
         </div>

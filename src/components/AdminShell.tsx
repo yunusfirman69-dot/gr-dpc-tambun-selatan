@@ -12,6 +12,7 @@ const adminNav = [
   { href: "/admin/program-kerja", label: "Kelola Program Kerja" },
   { href: "/admin/pengurus", label: "Kelola Pengurus" },
   { href: "/admin/kontak", label: "Kelola Kontak" },
+  { href: "/admin/aspirasi", label: "Aspirasi & Pesan" },
   { href: "/admin/anggota", label: "Data Anggota (Privat)" },
   { href: "/admin/pengaturan", label: "Pengaturan Admin" },
 ];

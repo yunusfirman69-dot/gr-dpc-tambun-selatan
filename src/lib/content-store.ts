@@ -58,6 +58,15 @@ export interface StoredMemberItem {
   createdAt: string;
 }
 
+export interface StoredAspirationItem {
+  id: string;
+  fullName: string;
+  contact: string;
+  village: string;
+  message: string;
+  createdAt: string;
+}
+
 export interface StoredProgramKerja {
   intro: string;
   landasan: string;
@@ -72,6 +81,7 @@ interface ContentStoreData {
   officials: StoredOfficialItem[];
   contact: StoredContactInfo;
   members: StoredMemberItem[];
+  aspirations: StoredAspirationItem[];
 }
 
 const DATA_FILE_PATH = path.join(process.cwd(), "src", "data", "content-store.json");
@@ -84,6 +94,7 @@ function getInitialData(): ContentStoreData {
     officials: officialsPlaceholder,
     contact: organizationInfo.contact,
     members: [],
+    aspirations: [],
   };
 }
 
@@ -100,6 +111,7 @@ async function readStore(): Promise<ContentStoreData> {
         : officialsPlaceholder,
       contact: parsed.contact ?? organizationInfo.contact,
       members: Array.isArray(parsed.members) ? parsed.members : [],
+      aspirations: Array.isArray(parsed.aspirations) ? parsed.aspirations : [],
     };
   } catch {
     return getInitialData();
@@ -517,6 +529,72 @@ export async function deleteMemberData(id: string): Promise<boolean> {
   const before = store.members.length;
   store.members = store.members.filter((item) => item.id !== id);
   if (store.members.length === before) return false;
+  await writeStore(store);
+  return true;
+}
+
+export async function getAspirationsData(): Promise<StoredAspirationItem[]> {
+  const convex = getConvexClient();
+  if (convex) {
+    try {
+      const rows = (await convex.query(
+        convexApi.aspirations.listAspirations,
+        {}
+      )) as StoredAspirationItem[];
+      return rows ?? [];
+    } catch {
+      return [];
+    }
+  }
+
+  const store = await readStore();
+  return store.aspirations;
+}
+
+export async function addAspirationData(
+  input: Omit<StoredAspirationItem, "id" | "createdAt">
+): Promise<StoredAspirationItem> {
+  const createdAt = new Date().toLocaleString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Jakarta",
+  });
+
+  const convex = getConvexClient();
+  if (convex) {
+    const id = (await convex.mutation(convexApi.aspirations.addAspiration, {
+      ...input,
+      createdAt,
+    })) as string;
+    return { id, ...input, createdAt };
+  }
+
+  const store = await readStore();
+  const newItem: StoredAspirationItem = {
+    id: `asp-${Date.now()}`,
+    ...input,
+    createdAt,
+  };
+  store.aspirations.unshift(newItem);
+  await writeStore(store);
+  return newItem;
+}
+
+export async function deleteAspirationData(id: string): Promise<boolean> {
+  const convex = getConvexClient();
+  if (convex) {
+    return (await convex.mutation(convexApi.aspirations.deleteAspiration, {
+      id,
+    })) as boolean;
+  }
+
+  const store = await readStore();
+  const before = store.aspirations.length;
+  store.aspirations = store.aspirations.filter((item) => item.id !== id);
+  if (store.aspirations.length === before) return false;
   await writeStore(store);
   return true;
 }
