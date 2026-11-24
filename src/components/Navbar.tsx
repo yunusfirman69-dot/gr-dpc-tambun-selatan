@@ -5,14 +5,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const navItems = [
+const navItems: { href: string; label: string; adminOnly?: boolean }[] = [
   { href: "/", label: "Beranda" },
   { href: "/profil", label: "Profil" },
   { href: "/pengurus", label: "Pengurus" },
   { href: "/program-kerja", label: "Program Kerja" },
   { href: "/berita", label: "Berita" },
   { href: "/galeri", label: "Galeri" },
-  { href: "/daftar-anggota", label: "Daftar Anggota" },
+  { href: "/daftar-anggota", label: "Daftar Anggota", adminOnly: true },
   { href: "/kontak", label: "Kontak" },
 ];
 
@@ -23,13 +23,19 @@ export default function Navbar() {
 
   useEffect(() => {
     if (pathname.startsWith("/admin")) return;
-    fetch("/api/admin/session")
+    fetch("/api/admin/session", { cache: "no-store" })
       .then((r) => r.json())
       .then((data: { authenticated?: boolean }) => {
         setIsAdminLoggedIn(Boolean(data.authenticated));
       })
-      .catch(() => {});
+      .catch(() => {
+        setIsAdminLoggedIn(false);
+      });
   }, [pathname]);
+
+  const visibleNavItems = navItems.filter(
+    (item) => !item.adminOnly || isAdminLoggedIn
+  );
 
   if (pathname.startsWith("/admin")) {
     return null;
@@ -64,7 +70,7 @@ export default function Navbar() {
 
         {/* Desktop Nav */}
         <nav className="hidden items-center gap-1 lg:flex">
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const isActive =
               item.href === "/"
                 ? pathname === "/"
@@ -124,7 +130,7 @@ export default function Navbar() {
       {mobileOpen && (
         <div className="border-t border-[#e7deda] bg-white px-4 pb-5 pt-3 lg:hidden">
           <nav className="flex flex-col gap-1">
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const isActive =
                 item.href === "/"
                   ? pathname === "/"
