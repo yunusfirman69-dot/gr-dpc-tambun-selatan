@@ -67,6 +67,23 @@ export interface StoredAspirationItem {
   createdAt: string;
 }
 
+export interface StoredOrganizationProfile {
+  partyName: string;
+  unitName: string;
+  region: string;
+  tagline: string;
+  quote: string;
+  historySummary: string;
+  historyTimeline: { period: string; title: string; description: string }[];
+  visiUtama: string;
+  haluanGerakan: string;
+  agendaGerakanRakyat: string[];
+  pancaDharma: string[];
+  limaJalan: string[];
+  misiPerjuangan: { number: string; title: string; description: string }[];
+  areas: string[];
+}
+
 export interface StoredProgramKerja {
   intro: string;
   landasan: string;
@@ -82,6 +99,26 @@ interface ContentStoreData {
   contact: StoredContactInfo;
   members: StoredMemberItem[];
   aspirations: StoredAspirationItem[];
+  profile?: StoredOrganizationProfile;
+}
+
+function getDefaultProfileData(): StoredOrganizationProfile {
+  return {
+    partyName: organizationInfo.partyName,
+    unitName: organizationInfo.unitName,
+    region: organizationInfo.region,
+    tagline: organizationInfo.tagline,
+    quote: organizationInfo.quote,
+    historySummary: organizationInfo.historySummary,
+    historyTimeline: organizationInfo.historyTimeline,
+    visiUtama: organizationInfo.visiMisiResmi.visiUtama,
+    haluanGerakan: organizationInfo.visiMisiResmi.haluanGerakan,
+    agendaGerakanRakyat: organizationInfo.visiMisiResmi.agendaGerakanRakyat,
+    pancaDharma: organizationInfo.visiMisiResmi.pancaDharma,
+    limaJalan: organizationInfo.visiMisiResmi.limaJalan,
+    misiPerjuangan: organizationInfo.visiMisiResmi.misiPerjuangan,
+    areas: organizationInfo.areas,
+  };
 }
 
 const DATA_FILE_PATH = path.join(process.cwd(), "src", "data", "content-store.json");
@@ -112,6 +149,7 @@ async function readStore(): Promise<ContentStoreData> {
       contact: parsed.contact ?? organizationInfo.contact,
       members: Array.isArray(parsed.members) ? parsed.members : [],
       aspirations: Array.isArray(parsed.aspirations) ? parsed.aspirations : [],
+      profile: parsed.profile,
     };
   } catch {
     return getInitialData();
@@ -597,4 +635,40 @@ export async function deleteAspirationData(id: string): Promise<boolean> {
   if (store.aspirations.length === before) return false;
   await writeStore(store);
   return true;
+}
+
+export async function getProfileData(): Promise<StoredOrganizationProfile> {
+  const fallback = getDefaultProfileData();
+  const convex = getConvexClient();
+  if (convex) {
+    try {
+      const row = (await convex.query(
+        convexApi.content.getProfile,
+        {}
+      )) as StoredOrganizationProfile | null;
+      return row ?? fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  const store = await readStore();
+  return store.profile ?? fallback;
+}
+
+export async function saveProfileData(
+  profile: StoredOrganizationProfile
+): Promise<StoredOrganizationProfile> {
+  const convex = getConvexClient();
+  if (convex) {
+    return (await convex.mutation(
+      convexApi.content.saveProfile,
+      profile
+    )) as StoredOrganizationProfile;
+  }
+
+  const store = await readStore();
+  store.profile = profile;
+  await writeStore(store);
+  return profile;
 }

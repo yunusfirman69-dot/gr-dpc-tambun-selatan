@@ -72,6 +72,8 @@ export const convexApi = {
     saveOfficials: "content:saveOfficials",
     getContact: "content:getContact",
     saveContact: "content:saveContact",
+    getProfile: "content:getProfile",
+    saveProfile: "content:saveProfile",
   },
   members: {
     listMembers: "members:listMembers",

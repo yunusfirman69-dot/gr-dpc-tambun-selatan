@@ -7,6 +7,7 @@ import { useState } from "react";
 
 const adminNav = [
   { href: "/admin", label: "Ringkasan" },
+  { href: "/admin/profil", label: "Kelola Profil & Visi Misi" },
   { href: "/admin/berita", label: "Upload & Kelola Berita" },
   { href: "/admin/galeri", label: "Upload & Kelola Galeri" },
   { href: "/admin/program-kerja", label: "Kelola Program Kerja" },

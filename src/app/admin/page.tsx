@@ -109,6 +109,21 @@ async function AdminDashboardContent() {
 
           <div className="rounded-2xl border border-[#e7deda] bg-white p-7 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-wider text-[#8d6a5e]">
+              Profil &amp; Visi Misi
+            </p>
+            <p className="mt-2 text-lg font-extrabold text-[#090909]">
+              Sejarah, Visi &amp; Misi
+            </p>
+            <Link
+              href="/admin/profil"
+              className="mt-5 inline-block rounded-full border border-[#090909] px-5 py-2.5 text-xs font-bold text-[#090909] transition-colors hover:bg-[#090909] hover:text-white"
+            >
+              Edit Profil &amp; Visi Misi
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border border-[#e7deda] bg-white p-7 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#8d6a5e]">
               Kontak Sekretariat
             </p>
             <p className="mt-2 text-lg font-extrabold text-[#090909]">

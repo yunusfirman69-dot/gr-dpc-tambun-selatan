@@ -340,3 +340,74 @@ export const saveContact = mutation({
     return args;
   },
 });
+
+// === ORGANIZATION PROFILE (PROFIL & VISI MISI) ===
+export const getProfile = query({
+  args: {},
+  handler: async (ctx) => {
+    const row = await ctx.db
+      .query("organizationProfile")
+      .withIndex("by_key", (q) => q.eq("key", "default"))
+      .first();
+    if (!row) return null;
+    return {
+      partyName: row.partyName,
+      unitName: row.unitName,
+      region: row.region,
+      tagline: row.tagline,
+      quote: row.quote,
+      historySummary: row.historySummary,
+      historyTimeline: row.historyTimeline,
+      visiUtama: row.visiUtama,
+      haluanGerakan: row.haluanGerakan,
+      agendaGerakanRakyat: row.agendaGerakanRakyat,
+      pancaDharma: row.pancaDharma,
+      limaJalan: row.limaJalan,
+      misiPerjuangan: row.misiPerjuangan,
+      areas: row.areas,
+    };
+  },
+});
+
+export const saveProfile = mutation({
+  args: {
+    partyName: v.string(),
+    unitName: v.string(),
+    region: v.string(),
+    tagline: v.string(),
+    quote: v.string(),
+    historySummary: v.string(),
+    historyTimeline: v.array(
+      v.object({
+        period: v.string(),
+        title: v.string(),
+        description: v.string(),
+      })
+    ),
+    visiUtama: v.string(),
+    haluanGerakan: v.string(),
+    agendaGerakanRakyat: v.array(v.string()),
+    pancaDharma: v.array(v.string()),
+    limaJalan: v.array(v.string()),
+    misiPerjuangan: v.array(
+      v.object({
+        number: v.string(),
+        title: v.string(),
+        description: v.string(),
+      })
+    ),
+    areas: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("organizationProfile")
+      .withIndex("by_key", (q) => q.eq("key", "default"))
+      .first();
+    if (existing) {
+      await ctx.db.patch(existing._id, args);
+    } else {
+      await ctx.db.insert("organizationProfile", { key: "default", ...args });
+    }
+    return args;
+  },
+});
